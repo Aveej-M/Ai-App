@@ -11,12 +11,12 @@ export default function SettingsLayout({ children }) {
     <div className="w-full text-black fixed">
       <SettingsHeader />
       {/* No Header here */}
-      <div className='flex w-full h-fit '>
+      <div className='flex w-full h-screen absolute top-0 pt-16'>
         <Settingsleftbar />
         {children}
       </div>
-      
-      
+
+
     </div>
   );
 }

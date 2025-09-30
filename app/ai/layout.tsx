@@ -12,14 +12,14 @@ export default function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
+
 
   return (
-        <div className="flex w-full">   
-          <ClientLayoutWrapper>
-            {children}
-          </ClientLayoutWrapper>
-            
-        </div>  
+    <div className="flex w-full pt-16">
+      <ClientLayoutWrapper>
+        {children}
+      </ClientLayoutWrapper>
+
+    </div>
   );
 }

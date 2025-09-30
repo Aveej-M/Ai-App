@@ -10,12 +10,14 @@ export default function HomeLayout({children}) {
     const homeLayout = pathName.startsWith("/settings");
 
     return(
-        <div className="w-full h-[100dvh]">
+        <div className="w-full min-h-screen">
             {!homeLayout && <BodyLayout />}
             
-            <div className={`flex w-full relative ${homeLayout ? 'top-0' : 'top-[67px]'}`}>
-               {!homeLayout && <Drawer />} 
-                {children}
+            <div className={`flex w-full relative ${homeLayout ? 'top-0' : ''}`}>
+                {/* <div className="fixed w-full flex"> */}
+                {!homeLayout && <Drawer />} 
+                    {children}
+                {/* </div> */}
             </div>
         </div>
     )

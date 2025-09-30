@@ -15,44 +15,55 @@
   --foreground: #171717;
 }
 
-@layer utilities{
+@layer utilities {
   .flex-items {
     @apply flex items-center justify-center gap-3
   }
-  .flex-items-2{
+
+  .flex-items-2 {
     @apply flex items-center justify-center
   }
+
   .justify-items {
     @apply flex items-center justify-between
   }
-  .flex-items-col{
+
+  .flex-items-col {
     @apply flex items-center justify-center flex-col
   }
+
   .hover-header {
     @apply hover:bg-gray-300 px-2 py-2 cursor-pointer rounded-3xl text-[16px]
   }
-  .tooltip{
+
+  .tooltip {
     @apply absolute left-full ml-3 top-1/2 -translate-y-1/2 z-10 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-300 px-3 py-2 text-sm font-medium text-white bg-gray-950 rounded-lg shadow-md dark:bg-gray-950 w-max
   }
-  .tooltip-point{
+
+  .tooltip-point {
     @apply absolute left-0 top-1/2 -translate-y-1/2 -ml-2 w-0 h-0 border-y-8 border-y-transparent border-r-8 border-r-gray-900 dark:border-r-gray-950
   }
-  .dashboard-active{
+
+  .dashboard-active {
     @apply flex items-center gap-3 text-gray-800 p-2 rounded-md hover:bg-gray-200 transition active:bg-gray-400 focus:bg-gray-300
   }
-  .gray-border{
+
+  .gray-border {
     @apply border border-gray-300 rounded-[10] hover:shadow-2xl duration-300 ease-in
   }
-  .container-border{
+
+  .container-border {
     @apply border border-gray-300 rounded shadow
   }
-  .form-input{
-    @apply border border-gray-400 h-10 w-full rounded mt-2 px-4 text-[14px] font-semibold  focus:border-green-500 outline-none focus:outline-none focus:ring-1 focus:ring-green-500 hover:border-green-500
+
+  .form-input {
+    @apply border border-gray-400 h-10 w-full rounded mt-2 px-4 text-[14px] font-semibold focus:border-green-500 outline-none focus:outline-none focus:ring-1 focus:ring-green-500 hover:border-green-500
   }
-  .topic-formInput{
+
+  .topic-formInput {
     @apply border border-gray-400 hover:border-green-400 focus:border-green-500 focus:outline-green-500 w-full rounded mt-2 px-4 text-[14px]
   }
- 
+
 }
 
 @theme inline {
@@ -63,7 +74,7 @@
   --font-google: "Google Sans Code";
   --font-sansation: "Sansation";
   --font-poppins: "Poppins";
-  --font-kode:"Kode Mono"
+  --font-kode: "Kode Mono"
 }
 
 @media (prefers-color-scheme: dark) {
@@ -72,7 +83,8 @@
     --foreground: #ededed;
   }
 }
-html{
+
+html {
   /* scrollbar-width: none; */
 
 }
@@ -87,50 +99,60 @@ body {
   /* text-shadow: none; */
 }
 
-header{
+header {
   background-color: #E7E6ED;
-  
+
 }
 
-h1{
+h1 {
   font-weight: bold;
 }
 
-button{
+button {
   cursor: pointer;
 }
 
-summary{
+summary {
   list-style: none;
 }
-.drop{
+
+.drop {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   /* transform: rotate(90deg); */
   opacity: 0.8;
   cursor: pointer;
 }
-details[open] .drop{
+
+details[open] .drop {
   transform: rotate(-180deg);
   opacity: 1;
   animation-duration: 1s;
 }
+
 /* hide scrollbar */
 .scrollbar-hide {
-  -ms-overflow-style: none; /* IE/Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
+
 .scrollbar-hide::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
+  /* Chrome/Safari */
 }
 
 /* show thin scrollbar */
 .scrollbar-show {
   -ms-overflow-style: auto;
-  scrollbar-width: thin; /* Firefox */
+  scrollbar-width: thin;
+  /* Firefox */
 }
+
 .scrollbar-show::-webkit-scrollbar {
   width: 8px;
 }
+
 .scrollbar-show::-webkit-scrollbar-thumb {
   background-color: rgba(100, 100, 100, 0.4);
   border-radius: 9999px;
@@ -139,16 +161,20 @@ details[open] .drop{
 /* show scrollbar on hover */
 .scrollbar-hover:hover {
   -ms-overflow-style: auto;
-  scrollbar-width: thin;      /* Firefox */
+  scrollbar-width: thin;
+  /* Firefox */
 }
+
 .scrollbar-hover:hover::-webkit-scrollbar {
   width: 8px;
 }
+
 .scrollbar-hover:hover::-webkit-scrollbar-thumb {
   background-color: rgba(100, 100, 100, 0.5);
   border-radius: 9999px;
 }
-.scrollbar-color{
+
+.scrollbar-color {
   scrollbar-color: rgb(172, 210, 172) rgb(255, 255, 255);
 }
 
@@ -163,48 +189,54 @@ details[open] .drop{
 }
 
 
-.ai-head{
+.ai-head {
   border-bottom: solid 1px #e8e2e2df;
 }
 
-.shadow-1{
+.shadow-1 {
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 
-.shadow-5{
+.shadow-5 {
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
-.shadow-6{
+.shadow-6 {
   box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 }
 
-.shadow-8{
+.shadow-8 {
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px, rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
 }
 
-.shadow-9{
+.shadow-9 {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
 
-.shadow-11{
+.shadow-11 {
   box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px, rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 }
-.shadow-12{
+
+.shadow-12 {
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 5px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
 }
-.shadow-19{
+
+.shadow-19 {
   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 }
-.shadow-53{
+
+.shadow-53 {
   box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
 }
-.shadow-64{
+
+.shadow-64 {
   box-shadow: rgba(17, 17, 26, 0.1) 0px 1px 0px;
 }
+
 .shadow-top {
   box-shadow: 0 -5px 5px -5px rgba(159, 159, 159, 0.672);
 }
+
 .shadow-right {
   box-shadow: 4px 0px 6px -1px rgba(0, 0, 0, 0.1), 2px 0px 4px -2px rgba(0, 0, 0, 0.06);
 }
@@ -216,6 +248,7 @@ details[open] .drop{
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -231,6 +264,7 @@ details[open] .drop{
     transform: translateY(50px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -249,19 +283,20 @@ details[open] .drop{
   font-size: 14px;
 }
 
-.react-datepicker__input-container input{
+.react-datepicker__input-container input {
   padding: 0 15px;
   width: 100% !important;
 }
 
-.react-datepicker{
+.react-datepicker {
   border: none !important;
   border-radius: 20px !important;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
 
 .react-datepicker__triangle {
-  margin-left: 90px !important; /* control position */
+  margin-left: 90px !important;
+  /* control position */
   color: white !important;
   fill: white !important;
   stroke: #aeaeae52 !important;
@@ -272,61 +307,79 @@ details[open] .drop{
   border-bottom: none !important;
 }
 
-.react-datepicker__header h2{
+.react-datepicker__header h2 {
   padding: 10px 0 !important;
 }
 
-.react-datepicker__navigation{
+.react-datepicker__navigation {
   top: 12px !important;
 }
 
-.react-datepicker__header .react-datepicker__day-name:first-child, .react-datepicker__day-name:last-child{
+.react-datepicker__header .react-datepicker__day-name:first-child,
+.react-datepicker__day-name:last-child {
   color: red;
 }
 
-.react-datepicker__day--in-range, .react-datepicker__day--selected{
+.react-datepicker__day--in-range,
+.react-datepicker__day--selected {
   background-color: var(--color-green-400) !important;
 }
 
-.react-datepicker__day--in-selecting-range{
+.react-datepicker__day--in-selecting-range {
   background-color: var(--color-green-100) !important;
 }
 
 .react-datepicker__day--range-start,
-.react-datepicker__day--range-end{
+.react-datepicker__day--range-end {
   background-color: var(--color-green-500) !important;
 }
 
-.react-datepicker__day--outside-month{
+.react-datepicker__day--outside-month {
   color: var(--color-gray-300) !important;
 }
 
-.react-datepicker__navigation:hover *::before{
+.react-datepicker__navigation:hover *::before {
   border-color: var(--color-green-500) !important;
 }
 
-.selectDay{
+.selectDay {
   border-bottom: solid 1px var(--color-gray-300);
 }
 
-.recharts-wrapper svg{
+/* React date picker 2 */
+.custom-datepicker-wrapper {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.custom-datepicker-wrapper .react-datepicker__input-container input {
+  border-left: 2px solid var(--color-green-500);
+}
+
+.holiday-calendar {
+  border-radius: 5px !important;
+}
+
+.recharts-wrapper svg {
   outline: none;
 }
-.recharts-pie-sector path{
+
+.recharts-pie-sector path {
   outline: none;
 }
+
 /* .recharts-tooltip-wrapper-right{
   transform: translate(210.5px, 240.5px) !important;
 } */
 
 
-.add-suggest:hover{
+.add-suggest:hover {
   background-image: url('/Settings/Add 1.png');
 }
 
 
 /* PROFILE FORM */
-.css-1u9des2-indicatorSeparator{
+.css-1u9des2-indicatorSeparator {
   height: 100%;
   margin-top: 0 !important;
 }
@@ -340,19 +393,64 @@ details[open] .drop{
 /* th:last-child{
   border-right: none;
 } */
-td{
+td {
   border-bottom: solid 1px var(--color-gray-400);
   padding: 5px 10px 5px 10px;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
+
 @keyframes fadeOut {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.9); }
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
 
+/* Settings Edit page's delete pop up animation */
+@keyframes popupIn {
+  0% {
+    transform: translateY(200px) scaleX(0);
+    opacity: 0;
+  }
 
+  100% {
+    transform: translateY(0) scaleX(1);
+    opacity: 1;
+  }
+}
 
+@keyframes popupOut {
+  0% {
+    transform: translateY(0) scaleX(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(200px) scaleX(0);
+    opacity: 0;
+  }
+}
+
+.popup-in {
+  animation: popupIn 0.2s ease-out forwards;
+}
+
+.popup-out {
+  animation: popupOut 0.2s ease-in forwards;
+}

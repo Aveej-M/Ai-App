@@ -1,76 +1,55 @@
 "use client";
 import { useState } from "react";
-import TimeDropDown from "../../compenents/Settings/TimePicker.jsx";
-
+import TimeRangeInput from "../../compenents/Settings/TimePicker.jsx";
 
 export default function WorkingDaysSelector({ selectedDays, setSelectedDays }) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  const [workingHours, setWorkingHours] = useState({});
+  const [workingHours, setWorkingHours] = useState({ Mon: { from: "09:00", to: "18:00" } });
 
   const handleToggle = (day) => {
     setSelectedDays((prev) => {
       if (prev.includes(day)) {
-        // Prevent removing the last remaining day
-        if (prev.length === 1) return prev;
+        if (prev.length === 1) return prev; // always keep at least one day
         return prev.filter((d) => d !== day);
-      } else {
-        return [...prev, day];
       }
+      return [...prev, day];
     });
   };
 
-   const handleTimeChange = (day, value) => {
-    
+  const handleTimeChange = (day, newTime) => {
     setWorkingHours((prev) => ({
       ...prev,
-      [day]: value,
+      [day]: newTime,
     }));
-
-    console.log(workingHours,'Working hours')
   };
 
   const handleCopy = () => {
-    // console.log('Data entered')
     if (selectedDays.length === 0) return;
 
-    const firstDay = days.find((d) => selectedDays.includes(d)); // get first in correct order
-    const firstValue = workingHours[firstDay] || "";
-    console.log(firstDay,'Data entered')
-    console.log(firstValue, 'First value')
-
-
+    const firstDay = selectedDays[0];
+    const firstValue = workingHours[firstDay];
+    console.log(firstDay, 'firstday')
+    console.log(workingHours, 'Workinghours')
+    console.log(firstValue, 'Firstvalue')
     if (!firstValue) return;
-    console.log('Data entered')
 
     const updated = {};
-    console.log('Data entered')
-
     selectedDays.forEach((day) => {
-      updated[day] = firstValue;
+      updated[day] = { ...firstValue }; // copy both from and to
     });
-    console.log(updated,'Updated')
 
-    setWorkingHours((prev) => ({
-      ...prev,
-      ...updated,
-    }));
-    console.log(workingHours,'Working hours')
+    setWorkingHours((prev) => ({ ...prev, ...updated }));
   };
-
 
   return (
     <div>
       <h1 className="mb-3 font-medium">Select the working days</h1>
+
       <div className="flex items-center flex-wrap gap-4">
         {days.map((day) => (
-          <label
-            key={day}
-            className="flex items-center gap-2 cursor-pointer select-none"
-          >
+          <label key={day} className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
-              value={day}
               checked={selectedDays.includes(day)}
               onChange={() => handleToggle(day)}
               className="w-4 h-4 accent-green-500 rounded"
@@ -78,43 +57,37 @@ export default function WorkingDaysSelector({ selectedDays, setSelectedDays }) {
             <span>{day}</span>
           </label>
         ))}
-
-         {/* Debug output */}
-        <div className="text-sm text-gray-600">
-            ({selectedDays.length === 1 ? `${selectedDays.length} day selected` : `${selectedDays.length} day's selected`})
-        </div>
       </div>
 
-      {/* Working hours per selected day */}
       <div className="mt-6">
-        {days
-          .filter((day) => selectedDays.includes(day))
-          .map((day, idx) => (
-            <div key={day} className="flex items-center gap-4">
-              <div className="flex-1">
-                <h2 className="font-medium mb-2">{day}</h2>
-                <TimeDropDown
-                  value={workingHours[day] || ""}
+        {selectedDays.map((day, idx) => (
+          <div key={day} className="mb-4">
+            <div className="">
+              <h2 className="font-medium mb-2">{day}</h2>
+              <div className="flex items-center gap-4">
+                <TimeRangeInput
+                  value={workingHours[day] || { from: "", to: "" }}
                   onChange={(val) => handleTimeChange(day, val)}
                 />
+
+                {/* Copy button for first selected day */}
+                {idx === 0 && selectedDays.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="px-3 py-1 text-sm text-green-500 flex items-center hover:text-green-600 gap-2 transition"
+                  >
+                    <i className="fa-regular fa-copy"></i>
+                    Copy to all
+                  </button>
+                )}
               </div>
-
-              {/* Copy button only for first visible day */}
-              {idx === 0 && selectedDays.length > 1 && (
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="px-3 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                  Copy to all
-                </button>
-              )}
             </div>
-          ))}
+
+
+          </div>
+        ))}
       </div>
-
-
-     
     </div>
   );
 }

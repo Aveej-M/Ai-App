@@ -10,18 +10,18 @@ import { Listbox } from '@headlessui/react';
 const options = [
   { label: 'Past 7 Days', value: 'last7' },
   { label: 'Past 30 Days', value: 'last30' },
-  { label: 'Pase 90 Days', value: 'last90'},
+  { label: 'Pase 90 Days', value: 'last90' },
   { label: 'This Week', value: 'thisWeek' },
-  { label: 'Previous Week', value: 'previousWeek'},
+  { label: 'Previous Week', value: 'previousWeek' },
   { label: 'This Month', value: 'thisMonth' },
-  { label: 'Previous Month', value: 'previousMonth'},
+  { label: 'Previous Month', value: 'previousMonth' },
   { label: 'This Year', value: 'thisYear' },
-  { label: 'Custom Range', value: 'custom'},
+  { label: 'Custom Range', value: 'custom' },
 ];
 
 
 
-const DateRangeInput = ({onRangeChange}) => {
+const DateRangeInput = ({ onRangeChange }) => {
   const today = new Date();
   const lastWeek = subWeeks(today, 1);
   const lastMonth = subMonths(today, 1);
@@ -40,7 +40,7 @@ const DateRangeInput = ({onRangeChange}) => {
     const value = selected.value;
     setSelectedOption(selected);
 
-    if(value === 'custom') return;
+    if (value === 'custom') return;
 
     let from, to;
 
@@ -61,7 +61,7 @@ const DateRangeInput = ({onRangeChange}) => {
         from = startOfISOWeek(today);
         to = endOfISOWeek(today);
         break;
-      case 'previousWeek': 
+      case 'previousWeek':
         from = startOfISOWeek(lastWeek);
         to = endOfISOWeek(lastWeek);
         break;
@@ -100,16 +100,16 @@ const DateRangeInput = ({onRangeChange}) => {
               setDateRange(update);
             }
           }}
-          
+
           startDate={startDate}
           endDate={endDate}
           selectsRange
           placeholderText="Select date range"
           dateFormat="dd MMM, yyyy"
           popperPlacement='bottom-end'
-          className="w-full h-[30px] p-2 border border-gray-300 outline-green-400 rounded text-black"
+          className="w-full h-[30px] p-2 border border-gray-400 outline-green-400 rounded text-black"
         />
-        <Image 
+        <Image
           src="/Analytics/calender.png"
           alt='Calendar icon'
           height={15}
@@ -122,14 +122,13 @@ const DateRangeInput = ({onRangeChange}) => {
       <Listbox value={selectedOption} onChange={handlePresetChange}>
         {({ open }) => (
           <div className="relative min-w-[160px]">
-            <Listbox.Button className={`w-full h-[30px] px-4 border ${open ? 'border-2 border-green-400' :'border-gray-300'} rounded text-[14px] text-black text-left relative`}>
+            <Listbox.Button className={`w-full h-[30px] px-4 border ${open ? 'border-2 border-green-400' : 'border-gray-400'} rounded text-[14px] text-black text-left relative`}>
               {selectedOption.label}
 
               {/* Rotating dropdown arrow */}
-              <Image 
-                className={`absolute top-2.5 right-2.5 pointer-events-none transition-transform duration-300 ${
-                  open ? 'rotate-180' : ''
-                }`}
+              <Image
+                className={`absolute top-2.5 right-2.5 pointer-events-none transition-transform duration-300 ${open ? 'rotate-180' : ''
+                  }`}
                 src="/Header/drop.png"
                 alt="Drop icon"
                 height={15}
@@ -143,8 +142,7 @@ const DateRangeInput = ({onRangeChange}) => {
                   key={idx}
                   value={option}
                   className={({ active }) =>
-                    `text-[14px] cursor-pointer p-2 selectDay ${
-                      active ? 'bg-green-100 text-green-700' : 'text-gray-700'
+                    `text-[14px] cursor-pointer p-2 selectDay ${active ? 'bg-green-100 text-green-700' : 'text-gray-700'
                     }`
                   }
                 >

@@ -77,11 +77,11 @@ const Settings = () => {
                     {filterOrg.map(({title, icon, link, info}, index) => (
                         <Link  key={index} 
                         href={link}
-                        className="h-full flex"
+                        className="h-full"
                         >
                             <div className="flex items-center gap-3 p-5 hover:bg-gray-100  rounded-[5px]">
                                 <i className={`${icon} text-green-500 text-[20px]`}></i>
-                                <div className="text-[16px] max-w-[500px] min-w-[300px]">
+                                <div className="text-[16px] max-w-[31.25rem] min-w-[12.5rem]">
                                     <h1>
                                         <HighlightedText text={title} highlight={searchInput} />
                                     </h1>

@@ -1,5 +1,5 @@
 'use client';
-
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,63 +8,64 @@ import { LayoutDashboard, BookOpen, MessageCircle, Sparkles, ChevronsLeft, Chevr
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const pathName = usePathname();
 
   return (
     <>
       {/* Sidebar */}
       <div
-        className={`min-h-[92dvh] h-[92dvh] sticky top-[67px] z-0 ${
-          isCollapsed ? 'w-20' : 'w-64'
-        } bg-gray-100 flex flex-col justify-between p-4 border-r border-gray-200 transition-all `}
+        className={`${pathName === '/ai/topics' ? 'h-[41rem] top-10 mt-16.5' : 'h-screen'} max-h-[100dvh] sticky pt-[68px] ${isCollapsed ? 'w-20' : 'w-64'
+          } bg-gray-100 flex flex-col justify-between p-4 border-r border-gray-200 transition-all `}
       >
-        <div>
+        <div className={`${pathName === '/ai/topics' ? 'relative -top-14' : 'pt-2.5'}`}>
           <nav className="space-y-2">
             <Link
-              href="#"
-              className={`dashboard-active ${ isCollapsed ? 'justify-center ' : 'justify-start'}`}
+              href="/dashboard"
+              className={`dashboard-active ${isCollapsed ? 'justify-center ' : 'justify-start'}`}
             >
-              
-              <Image 
+
+              <Image
                 src="/dashboard.png"
                 alt="dashboard icon"
-                width={20}
-                height={20}
-                />
+                width={50}
+                height={50}
+                className='h-5 w-5'
+              />
               {!isCollapsed && <span>Dashboard</span>}
             </Link>
             <Link
-              href="#"
-              className={`dashboard-active ${ isCollapsed ? 'justify-center ' : 'justify-start'}`}
+              href="/knowledge"
+              className={`dashboard-active ${isCollapsed ? 'justify-center ' : 'justify-start'}`}
             >
-              
-              <Image 
+
+              <Image
                 src="/book-icon.png"
                 alt="knowledge icon"
                 width={20} height={20}
                 className='w-[20px]'
-                />
+              />
               {!isCollapsed && <span>Knowledge Base</span>}
             </Link>
             <Link
               href="#"
-              className={`dashboard-active ${ isCollapsed ? 'justify-center ' : 'justify-start'}`}
+              className={`dashboard-active ${isCollapsed ? 'justify-center ' : 'justify-start'}`}
             >
-              <Image 
+              <Image
                 src="/Vector.png"
                 alt="vector icon"
                 width={20} height={20}
-                />
+              />
               {!isCollapsed && <span>Live Chat</span>}
             </Link>
             <Link
               href='/ai'
-              className={`dashboard-active ${ isCollapsed ? 'justify-center ' : 'justify-start'}`}
+              className={`dashboard-active ${isCollapsed ? 'justify-center ' : 'justify-start'}`}
             >
-              <Image 
+              <Image
                 src="/ai-icon.png"
                 alt="Ai icon"
                 width={20} height={20}
-                />
+              />
               {!isCollapsed && <span>Ai Agent</span>}
             </Link>
           </nav>

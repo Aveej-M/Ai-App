@@ -7,17 +7,17 @@ import Header from "./Header";
 import AccountProfile from "./AccountProfile";
 
 const BodyLayout = () => {
-    const [openProfile, setOpenProfile] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
 
   return (
-    <div>
-        <Header openProfile={openProfile} setOpenProfile={setOpenProfile} />
-        {openProfile && (
-            <div>
-                <AccountProfile openProfile={openProfile} setOpenProfile={setOpenProfile} />
-            </div>
-        )}
-    </div>
+    <>
+      <Header openProfile={openProfile} setOpenProfile={setOpenProfile} />
+      {openProfile && (
+        <div>
+          <AccountProfile openProfile={openProfile} setOpenProfile={setOpenProfile} />
+        </div>
+      )}
+    </>
   )
 }
 
