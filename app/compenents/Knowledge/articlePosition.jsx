@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const ArticleList = ({ categoryData, setCategoryData, catIdx, fldIdx, setOpenUpdateArticlePosition }) => {
+const ArticleList = ({ categoryData, setCategoryData, catIdx, fldIdx, setOpenUpdateArticlePosition, sds }) => {
     // Get the articles of the selected folder
     const initialArticles = categoryData[catIdx].folder[fldIdx].article;
 
@@ -27,8 +27,8 @@ const ArticleList = ({ categoryData, setCategoryData, catIdx, fldIdx, setOpenUpd
     };
 
     const handleUpdate = () => {
-        setCategoryData((prev) =>
-            prev.map((cat, cIndex) => {
+        setCategoryData((prev) => {
+            const updated = prev.map((cat, cIndex) => {
                 if (cIndex === catIdx) {
                     return {
                         ...cat,
@@ -42,7 +42,9 @@ const ArticleList = ({ categoryData, setCategoryData, catIdx, fldIdx, setOpenUpd
                 }
                 return cat;
             })
-        );
+            sds(updated);
+            return updated;
+        });
 
         setOpenUpdateArticlePosition(false); // close modal
     };

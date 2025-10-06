@@ -1,0 +1,141 @@
+[
+    {
+        "category": "Pickachachu",
+        "visibility": "all",
+        "folder": [
+            {
+                "folderName": "Chuchu",
+                "visibility": "agents",
+                "article": [
+                    {
+                        "title": "Untitled Article 2",
+                        "context": "",
+                        "artDel": false,
+                        "artType": "draft"
+                    }
+                ],
+                "fldDel": false,
+                "fldType": "publish"
+            }
+        ],
+        "generalArticle": [
+            {
+                "artTitle": "Bullbusor",
+                "artContext": "",
+                "artDel": false,
+                "artType": "publish"
+            }
+        ],
+        "type": "publish"
+    },
+    {
+        "category": "General",
+        "visibility": "all",
+        "folder": [
+            {
+                "folderName": "Geene",
+                "visibility": "agents",
+                "article": [],
+                "fldDel": false,
+                "fldType": "publish"
+            },
+            {
+                "folderName": "General",
+                "visibility": "agents",
+                "article": [
+                    {
+                        "title": "title 2",
+                        "context": "Start writing your article here",
+                        "artDel": false,
+                        "artType": "publish"
+                    },
+                    {
+                        "title": "Untitled Article 2",
+                        "context": "",
+                        "artDel": false,
+                        "artType": ""
+                    }
+                ],
+                "fldDel": false,
+                "fldType": "publish"
+            }
+        ],
+        "generalArticle": [
+            {
+                "artTitle": "Title 1",
+                "artContext": "",
+                "artDel": false,
+                "artType": "publish"
+            },
+            {
+                "artTitle": "Title 2",
+                "artContext": "",
+                "artDel": false,
+                "artType": ""
+            }
+        ],
+        "type": "publish"
+    },
+    {
+        "category": "FAQs",
+        "visibility": "all",
+        "folder": [
+            {
+                "folderName": "Getting Started",
+                "visibility": "bot",
+                "article": [
+                    {
+                        "title": "title 1",
+                        "context": "Start writing your article here",
+                        "artDel": false,
+                        "artType": "publish"
+                    },
+                    {
+                        "title": "title 2",
+                        "context": "Start writing your article here",
+                        "artDel": false,
+                        "artType": "publish"
+                    },
+                    {
+                        "title": "title 3",
+                        "context": "Start writing your article here",
+                        "artDel": false,
+                        "artType": "publish"
+                    },
+                    {
+                        "title": "title 4",
+                        "context": "Start writing your article here",
+                        "artDel": false,
+                        "artType": "publish"
+                    }
+                ],
+                "fldDel": false,
+                "fldType": "publish"
+            }
+        ],
+        "generalArticle": [],
+        "type": "publish"
+    },
+    {
+        "category": "General",
+        "visibility": "all",
+        "folder": [
+            {
+                "folderName": "FAQs",
+                "visibility": "agents",
+                "article": [
+                    {
+                        "title": "title 3",
+                        "context": "Start writing your article here",
+                        "artDel": false,
+                        "artType": "publish"
+                    }
+                ],
+                "fldDel": false,
+                "fldType": "publish"
+            }
+        ],
+        "generalArticle": [],
+        "type": "publish"
+    }
+]

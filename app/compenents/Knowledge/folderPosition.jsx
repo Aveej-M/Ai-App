@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const FolderList = ({ categoryData, setCategoryData, catIdx, setOpenUpdateFolderPosition }) => {
+const FolderList = ({ categoryData, setCategoryData, catIdx, setOpenUpdateFolderPosition, sds }) => {
     const initialArticles = categoryData[catIdx].folder;
 
     const [tempData, setTempData] = useState([...initialArticles]); // temp drag state
@@ -26,8 +26,8 @@ const FolderList = ({ categoryData, setCategoryData, catIdx, setOpenUpdateFolder
     };
 
     const handleUpdate = () => {
-        setCategoryData(prev =>
-            prev.map((category, index) => {
+        setCategoryData(prev => {
+            const updated = prev.map((category, index) => {
                 if (index === catIdx) {
                     return {
                         ...category,
@@ -36,7 +36,9 @@ const FolderList = ({ categoryData, setCategoryData, catIdx, setOpenUpdateFolder
                 }
                 return category;
             })
-        );
+            sds(updated);
+            return updated;
+        });
         setOpenUpdateFolderPosition(false);
     };
 

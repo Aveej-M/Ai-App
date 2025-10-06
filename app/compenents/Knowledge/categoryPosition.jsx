@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const CategoryList = ({ categoryData, setCategoryData, setOpenUpdateCategoryPosition }) => {
+const CategoryList = ({ categoryData, setCategoryData, setOpenUpdateCategoryPosition, sds }) => {
 
     const [tempData, setTempData] = useState([...categoryData]); // temp drag state
     const [draggedIndex, setDraggedIndex] = useState(null);
@@ -26,6 +26,7 @@ const CategoryList = ({ categoryData, setCategoryData, setOpenUpdateCategoryPosi
 
     const handleUpdate = () => {
         setCategoryData(tempData); // commit the changes
+        sds(tempData)
         setOpenUpdateCategoryPosition(false);
     };
 

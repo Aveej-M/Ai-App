@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const GeneralArticleList = ({ categoryData, setCategoryData, catIdx, setOpenUpdateGeneralArticlePosition }) => {
+const GeneralArticleList = ({ categoryData, setCategoryData, catIdx, setOpenUpdateGeneralArticlePosition, sds }) => {
     const initialArticles = categoryData[catIdx].generalArticle;
 
     const [tempData, setTempData] = useState([...initialArticles]); // temp drag state
@@ -27,8 +27,8 @@ const GeneralArticleList = ({ categoryData, setCategoryData, catIdx, setOpenUpda
 
     const handleUpdate = () => {
         // Update the specific category's generalArticle with the new order
-        setCategoryData(prev =>
-            prev.map((category, index) => {
+        setCategoryData(prev => {
+            const updated = prev.map((category, index) => {
                 if (index === catIdx) {
                     return {
                         ...category,
@@ -37,7 +37,9 @@ const GeneralArticleList = ({ categoryData, setCategoryData, catIdx, setOpenUpda
                 }
                 return category;
             })
-        );
+            sds(updated);
+            return updated;
+        });
         setOpenUpdateGeneralArticlePosition(false);
     };
 
@@ -75,7 +77,7 @@ const GeneralArticleList = ({ categoryData, setCategoryData, catIdx, setOpenUpda
                 <button
                     type="button"
                     className="h-[40px] w-[140] text-sm border border-gray-300 rounded-3xl bg-green-500 hover:bg-green-600 font-bold text-white shadow"
-                    onClick={handleUpdate}
+                    onClick={() => { handleUpdate() }}
                 >
                     Update Position
                 </button>
