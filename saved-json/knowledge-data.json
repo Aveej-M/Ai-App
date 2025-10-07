@@ -1,40 +1,12 @@
 [
     {
-        "category": "Pickachachu",
-        "visibility": "all",
-        "folder": [
-            {
-                "folderName": "Chuchu",
-                "visibility": "agents",
-                "article": [
-                    {
-                        "title": "Untitled Article 2",
-                        "context": "",
-                        "artDel": false,
-                        "artType": "draft"
-                    }
-                ],
-                "fldDel": false,
-                "fldType": "publish"
-            }
-        ],
-        "generalArticle": [
-            {
-                "artTitle": "Bullbusor",
-                "artContext": "",
-                "artDel": false,
-                "artType": "publish"
-            }
-        ],
-        "type": "publish"
-    },
-    {
         "category": "General",
         "visibility": "all",
         "folder": [
             {
                 "folderName": "Geene",
-                "visibility": "agents",
+                "visibility": "bot",
+                "order": "alphabetical",
                 "article": [],
                 "fldDel": false,
                 "fldType": "publish"
@@ -42,18 +14,49 @@
             {
                 "folderName": "General",
                 "visibility": "agents",
+                "order": "creation_latest",
                 "article": [
                     {
                         "title": "title 2",
-                        "context": "Start writing your article here",
+                        "context": [
+                            {
+                                "type": "ordered-list",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
                         "artDel": false,
-                        "artType": "publish"
+                        "artType": "publish",
+                        "createDate": "03/10/2025",
+                        "modifiedDate": "05/10/2025"
                     },
                     {
                         "title": "Untitled Article 2",
-                        "context": "",
+                        "context": [
+                            {
+                                "type": "ordered-list",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
                         "artDel": false,
-                        "artType": ""
+                        "artType": "publish",
+                        "createDate": "02/10/2025",
+                        "modifiedDate": "04/10/2025"
+                    },
+                    {
+                        "title": "Untitled Article 3",
+                        "context": [
+                            {
+                                "type": "ordered-list",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
+                        "artDel": false,
+                        "artType": "",
+                        "createDate": "07/10/2025",
+                        "modifiedDate": ""
                     }
                 ],
                 "fldDel": false,
@@ -63,13 +66,25 @@
         "generalArticle": [
             {
                 "artTitle": "Title 1",
-                "artContext": "",
+                "artContext": [
+                    {
+                        "type": "ordered-list",
+                        "tag": [],
+                        "content": "Starting to add article"
+                    }
+                ],
                 "artDel": false,
                 "artType": "publish"
             },
             {
                 "artTitle": "Title 2",
-                "artContext": "",
+                "artContext": [
+                    {
+                        "type": "ordered-list",
+                        "tag": [],
+                        "content": "Starting to add article"
+                    }
+                ],
                 "artDel": false,
                 "artType": ""
             }
@@ -78,57 +93,68 @@
     },
     {
         "category": "FAQs",
-        "visibility": "all",
+        "visibility": "loggedIn",
         "folder": [
             {
                 "folderName": "Getting Started",
-                "visibility": "bot",
+                "visibility": "agents",
+                "order": "creation_oldest",
                 "article": [
                     {
-                        "title": "title 1",
-                        "context": "Start writing your article here",
-                        "artDel": false,
-                        "artType": "publish"
-                    },
-                    {
                         "title": "title 2",
-                        "context": "Start writing your article here",
+                        "context": [
+                            {
+                                "type": "ordered-list",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
                         "artDel": false,
-                        "artType": "publish"
+                        "artType": "publish",
+                        "createDate": "04/10/2025",
+                        "modifiedDate": "06/10/2025"
                     },
                     {
-                        "title": "title 3",
-                        "context": "Start writing your article here",
+                        "title": "title 1",
+                        "context": [
+                            {
+                                "type": "ordered-list",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
                         "artDel": false,
-                        "artType": "publish"
+                        "artType": "publish",
+                        "createDate": "05/10/2025",
+                        "modifiedDate": "07/10/2025"
                     },
                     {
                         "title": "title 4",
-                        "context": "Start writing your article here",
+                        "context": [
+                            {
+                                "type": "ordered-list",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
                         "artDel": false,
-                        "artType": "publish"
-                    }
-                ],
-                "fldDel": false,
-                "fldType": "publish"
-            }
-        ],
-        "generalArticle": [],
-        "type": "publish"
-    },
-    {
-        "category": "General",
-        "visibility": "all",
-        "folder": [
-            {
-                "folderName": "FAQs",
-                "visibility": "agents",
-                "article": [
+                        "artType": "publish",
+                        "createDate": "05/10/2025",
+                        "modifiedDate": "06/10/2025"
+                    },
                     {
                         "title": "title 3",
-                        "context": "Start writing your article here",
+                        "context": [
+                            {
+                                "type": "ordered-list",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
                         "artDel": false,
-                        "artType": "publish"
+                        "artType": "publish",
+                        "createDate": "06/10/2025",
+                        "modifiedDate": "07/10/2025"
                     }
                 ],
                 "fldDel": false,

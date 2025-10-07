@@ -4,6 +4,7 @@ import CategoryList from "../compenents/Knowledge/categoryPosition";
 import ArticleList from "../compenents/Knowledge/articlePosition";
 import FolderList from "../compenents/Knowledge/folderPosition";
 import GeneralArticleList from "../compenents/Knowledge/generalArticlePosition";
+import ArticleDocx from "../compenents/Knowledge/articleDocx";
 import Select from 'react-select';
 import { customStyles } from '../data/selectStyle';
 import Link from "next/link";
@@ -78,6 +79,15 @@ const visibleFolder = [
     { label: "Logged in Users", value: "loggedIn" },
 ]
 
+const orderArticles = [
+    { label: "Alphabetically (A-Z)", value: "alphabetical" },
+    { label: "Creation Date (Latest to Oldest)", value: "creation_latest" },
+    { label: "Creation Date (Oldest to Latest)", value: "creation_oldest" },
+    { label: "Modified Date (Latest to Oldest)", value: "modified_latest" },
+    { label: "Modified Date (Oldest to Latest)", value: "modified_oldest" }
+];
+
+
 const Knowledge = ({ dataCategory }) => {
     const [categoryData, setCategoryData] = useState(dataCategory);
     // Save data to backend JSON file
@@ -112,7 +122,7 @@ const Knowledge = ({ dataCategory }) => {
     const [editingCategoryIndex, setEditingCategoryIndex] = useState(null);
     const [animateOut, setAnimateOut] = useState(false);
     const [notification, setNotification] = useState({ message: '', visibility: false, type: '' });
-    const hasError = false;
+    const [folderOrder, setFolderOrder] = useState();
 
     // Variables of Edit Category
     const [editCategory, setEditCategory] = useState(false);
@@ -161,11 +171,21 @@ const Knowledge = ({ dataCategory }) => {
     };
 
     const handleAddCategory = () => {
-        if (!newCategory.trim()) return;
+        const trimmedName = newCategory.trim();
+        if (!trimmedName) return;
+        // Check for duplicate (case-insensitive)
+        const exists = categoryData.some(cat => cat.category.toLowerCase() === trimmedName.toLowerCase());
+        if (exists) {
+            setNotification({ message: 'Category name already exists!', visibility: true, type: 'error' });
+            setTimeout(() => {
+                setNotification((prev) => ({ ...prev, visibility: false }));
+            }, 3000);
+            return;
+        }
         setCategoryData((prev) => {
             const updated = [
                 {
-                    category: newCategory.trim(),
+                    category: trimmedName,
                     visibility: "all",
                     folder: [],
                     generalArticle: [],
@@ -218,7 +238,13 @@ const Knowledge = ({ dataCategory }) => {
                             ...(gen.generalArticle ?? []),
                             {
                                 artTitle: newArticleName.trim(),
-                                artContext: "",
+                                artContext: [
+                                    {
+                                        type: "",
+                                        tag: [],
+                                        content: ""
+                                    }
+                                ],
                                 artDel: false,
                                 artType: "",
                             },
@@ -235,7 +261,6 @@ const Knowledge = ({ dataCategory }) => {
         setEditingCategoryIndex(null);
     };
 
-
     const handleAddArticle = (catIdx, fIdx) => {
         setCategoryData((prev) => {
             const updated = prev.map((cat, index) => {
@@ -249,10 +274,18 @@ const Knowledge = ({ dataCategory }) => {
                                     article: [
                                         ...fld.article,
                                         {
-                                            title: `Untitled Article ${fld.article.length + 1}`,
-                                            context: "",
+                                            title: "Untitled Article",
+                                            context: [
+                                                {
+                                                    type: "",
+                                                    tag: [],
+                                                    content: "Starting to add article"
+                                                }
+                                            ],
                                             artDel: false,
                                             artType: "",
+                                            createDate: new Date().toLocaleDateString('en-GB'),
+                                            modifiedDate: ""
                                         },
                                     ],
                                 };
@@ -297,11 +330,20 @@ const Knowledge = ({ dataCategory }) => {
                         ...category,
                         folder: category.folder.map((folder, fIndex) => {
                             if (fIndex === fldIdx) {
-                                return {
+                                const updatedFolder = {
                                     ...folder,
                                     folderName: updateFolderName.trim(),
                                     visibility: visibilityFolder,
+                                    order: folderOrder || folder.order || 'alphabetical',
                                 };
+
+                                // 🧠 Apply sorting before saving
+                                updatedFolder.article = sortArticles(
+                                    folder.article,
+                                    updatedFolder.order
+                                );
+
+                                return updatedFolder;
                             }
                             return folder;
                         }),
@@ -331,7 +373,8 @@ const Knowledge = ({ dataCategory }) => {
                                         if (aIndex === artIdx) {
                                             return {
                                                 ...article,
-                                                title: updateArticleName.trim()
+                                                title: updateArticleName.trim(),
+                                                modifiedDate: new Date().toLocaleDateString('en-GB')
                                             }
                                         }
                                         return article;
@@ -606,6 +649,30 @@ const Knowledge = ({ dataCategory }) => {
         });
     };
 
+    const sortArticles = (articles, orderType) => {
+        switch (orderType) {
+            case "alphabetical":
+                return [...articles].sort((a, b) => a.title.localeCompare(b.title));
+
+            case "creation_latest":
+                return [...articles].sort((a, b) => new Date(b.createDate) - new Date(a.createDate));
+
+            case "creation_oldest":
+                return [...articles].sort((a, b) => new Date(a.createDate) - new Date(b.createDate));
+
+            case "modified_latest":
+                return [...articles].sort((a, b) => new Date(b.modifiedDate) - new Date(a.modifiedDate));
+
+            case "modified_oldest":
+                return [...articles].sort((a, b) => new Date(a.modifiedDate) - new Date(b.modifiedDate));
+
+            default:
+                return articles;
+        }
+
+    };
+
+
 
 
     return (
@@ -703,7 +770,6 @@ const Knowledge = ({ dataCategory }) => {
                                 >
                                 </Select>
 
-
                                 <label className="inline-flex items-center cursor-pointer gap-3 mt-3">
                                     <span className="ms-3 text-sm font-medium text-gray-900 ">Toggle me</span>
 
@@ -714,7 +780,38 @@ const Knowledge = ({ dataCategory }) => {
                             </div>
                         )}
                         {editFolder && (
-                            <div className="mt-3">
+                            <div className="flex flex-col gap-3 mt-3">
+                                <label htmlFor="order-articles">Order Articles <span className="text-red-500"> *</span></label>
+                                <Select
+                                    instanceId="order-articles"
+                                    options={orderArticles}
+                                    value={orderArticles.find(option => {
+                                        if (!editingCategoryIndex) return false;
+                                        const { catIdx, fldIdx } = editingCategoryIndex;
+                                        return option.value === (categoryData?.[catIdx]?.folder?.[fldIdx]?.order || 'alphabetical');
+                                    })}
+                                    onChange={(e) => {
+                                        if (editingCategoryIndex && editingCategoryIndex.catIdx !== undefined && editingCategoryIndex.fldIdx !== undefined) {
+                                            const { catIdx, fldIdx } = editingCategoryIndex;
+                                            setCategoryData(prev => {
+                                                const updated = prev.map((cat, cIdx) => {
+                                                    if (cIdx !== catIdx) return cat;
+                                                    return {
+                                                        ...cat,
+                                                        folder: cat.folder.map((fld, fIdx) => {
+                                                            if (fIdx !== fldIdx) return fld;
+                                                            return { ...fld, order: e.value };
+                                                        })
+                                                    };
+                                                });
+                                                saveDataToServer(updated);
+                                                return updated;
+                                            });
+                                        }
+                                    }}
+                                    styles={customStyles}
+                                />
+
                                 <label htmlFor="visible-to">Visible To <span className="text-red-500"> *</span></label>
                                 <Select
                                     instanceId="visible-to"
@@ -878,6 +975,7 @@ const Knowledge = ({ dataCategory }) => {
             </div>
 
             <div className="flex-1 flex flex-row gap-2 relative">
+                {/* Left Area */}
                 <div className="w-[350px] min-w-[350px] relative bg-gray-200 flex flex-col h-auto">
                     <div className="flex-1 absolute w-full overflow-y-auto p-5 h-full">
                         {categoryData.map(({ category, folder, generalArticle, type }, catIdx) => (
@@ -1052,7 +1150,7 @@ const Knowledge = ({ dataCategory }) => {
                                             {openFolders.includes(`${catIdx}-${fldIdx}`) && (
                                                 <>
                                                     <div className="ml-4 text-gray-500 border-l border-l-gray-400 flex flex-col gap-2">
-                                                        {fld.article.map(({ title, artDel }, artIdx) => (
+                                                        {sortArticles(fld.article, fld.order).map(({ title, artDel }, artIdx) => (
                                                             <div
                                                                 key={artIdx}
                                                                 className={`${!artDel ? 'block' : 'hidden!'} justify-items w-full group px-3 py-1 cursor-pointer ${selectedArticle.categoryIndex === catIdx &&
@@ -1192,10 +1290,11 @@ const Knowledge = ({ dataCategory }) => {
                     </div>
                 </div>
 
-
-                <div className="h-full w-full p-2 bg-gray-300 overflow-y-auto">
-
-                </div>
+                {/* Right Area */}
+                <ArticleDocx
+                    categoryData={categoryData}
+                    selectedArticle={selectedArticle}
+                />
             </div>
 
             {notification.visibility && (
