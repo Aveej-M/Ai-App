@@ -7,56 +7,22 @@
                 "folderName": "Geene",
                 "visibility": "bot",
                 "order": "alphabetical",
-                "article": [],
-                "fldDel": false,
-                "fldType": "publish"
-            },
-            {
-                "folderName": "General",
-                "visibility": "agents",
-                "order": "creation_latest",
                 "article": [
                     {
-                        "title": "title 2",
+                        "title": "Article",
                         "context": [
                             {
-                                "type": "ordered-list",
-                                "tag": [],
+                                "type": "",
+                                "tag": [
+                                    "data"
+                                ],
                                 "content": "Starting to add article"
                             }
                         ],
                         "artDel": false,
                         "artType": "publish",
-                        "createDate": "03/10/2025",
-                        "modifiedDate": "05/10/2025"
-                    },
-                    {
-                        "title": "Untitled Article 2",
-                        "context": [
-                            {
-                                "type": "ordered-list",
-                                "tag": [],
-                                "content": "Starting to add article"
-                            }
-                        ],
-                        "artDel": false,
-                        "artType": "publish",
-                        "createDate": "02/10/2025",
-                        "modifiedDate": "04/10/2025"
-                    },
-                    {
-                        "title": "Untitled Article 3",
-                        "context": [
-                            {
-                                "type": "ordered-list",
-                                "tag": [],
-                                "content": "Starting to add article"
-                            }
-                        ],
-                        "artDel": false,
-                        "artType": "",
-                        "createDate": "07/10/2025",
-                        "modifiedDate": ""
+                        "createDate": "08/10/2025",
+                        "modifiedDate": "08/10/2025"
                     }
                 ],
                 "fldDel": false,
@@ -65,11 +31,18 @@
         ],
         "generalArticle": [
             {
-                "artTitle": "Title 1",
+                "artTitle": "Title",
                 "artContext": [
                     {
-                        "type": "ordered-list",
-                        "tag": [],
+                        "type": "paragraph",
+                        "tag": [
+                            [
+                                "Array",
+                                "data"
+                            ],
+                            "data",
+                            "Array"
+                        ],
                         "content": "Starting to add article"
                     }
                 ],
@@ -80,13 +53,15 @@
                 "artTitle": "Title 2",
                 "artContext": [
                     {
-                        "type": "ordered-list",
-                        "tag": [],
+                        "type": "paragraph",
+                        "tag": [
+                            "Data"
+                        ],
                         "content": "Starting to add article"
                     }
                 ],
                 "artDel": false,
-                "artType": ""
+                "artType": "publish"
             }
         ],
         "type": "publish"
@@ -96,6 +71,55 @@
         "visibility": "loggedIn",
         "folder": [
             {
+                "folderName": "Folder D",
+                "visibility": "agents",
+                "article": [
+                    {
+                        "title": "Article 1",
+                        "context": [
+                            {
+                                "type": "",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
+                        "artDel": false,
+                        "artType": "",
+                        "createDate": "08/10/2025",
+                        "modifiedDate": "08/10/2025"
+                    },
+                    {
+                        "title": "Article 2",
+                        "context": [
+                            {
+                                "type": "",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
+                        "artDel": false,
+                        "artType": "publish",
+                        "createDate": "08/10/2025",
+                        "modifiedDate": "08/10/2025"
+                    },
+                    {
+                        "title": "Untitled Article",
+                        "context": [
+                            {
+                                "type": "",
+                                "tag": [],
+                                "content": "Starting to add article"
+                            }
+                        ],
+                        "artDel": false,
+                        "artType": "publish",
+                        "createDate": "08/10/2025",
+                        "modifiedDate": ""
+                    }
+                ],
+                "fldType": ""
+            },
+            {
                 "folderName": "Getting Started",
                 "visibility": "agents",
                 "order": "creation_oldest",
@@ -104,7 +128,7 @@
                         "title": "title 2",
                         "context": [
                             {
-                                "type": "ordered-list",
+                                "type": "paragraph",
                                 "tag": [],
                                 "content": "Starting to add article"
                             }
@@ -118,7 +142,7 @@
                         "title": "title 1",
                         "context": [
                             {
-                                "type": "ordered-list",
+                                "type": "paragraph",
                                 "tag": [],
                                 "content": "Starting to add article"
                             }
@@ -132,7 +156,7 @@
                         "title": "title 4",
                         "context": [
                             {
-                                "type": "ordered-list",
+                                "type": "paragraph",
                                 "tag": [],
                                 "content": "Starting to add article"
                             }
@@ -146,7 +170,7 @@
                         "title": "title 3",
                         "context": [
                             {
-                                "type": "ordered-list",
+                                "type": "paragraph",
                                 "tag": [],
                                 "content": "Starting to add article"
                             }

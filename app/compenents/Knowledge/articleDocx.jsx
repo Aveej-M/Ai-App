@@ -1,14 +1,114 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import EditableArticle from "./editableArticle";
+import SlateEditor from "./editibleArticle2";
 
-const ArticleDocx = ({ categoryData, selectedArticle }) => {
+const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEditArticleName, handleEditGeneralArtilceName }) => {
     const [openTagInput, setOpenTagInput] = useState(false);
-    const [tagInput, setTagInput] = useState("")
+    const [tagInput, setTagInput] = useState('');
+    const [tags, setTags] = useState([]);
     const [isFocused, setIsFocused] = useState(false);
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [editTitleValue, setEditTitleValue] = useState("");
+    const titleInputRef = useRef(null);
+    const tagInputRef = useRef(null);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        if (isEditingTitle && titleInputRef.current) {
+            titleInputRef.current.focus();
+        }
+    }, [isEditingTitle]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                tagInputRef.current &&
+                !tagInputRef.current.contains(event.target) &&
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
+                setIsFocused(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!selectedArticle || (selectedArticle.articleIndex === null && selectedArticle.generalArticleIndex === null)) {
+            setTags([]);
+            return;
+        }
+        const { categoryIndex, folderIndex, articleIndex, generalArticleIndex } = selectedArticle;
+        let tagArr = [];
+        if (folderIndex != null && articleIndex != null) {
+            const article = categoryData?.[categoryIndex]?.folder?.[folderIndex]?.article?.[articleIndex];
+            // Collect tags from all blocks, flatten, and deduplicate
+            if (Array.isArray(article?.context)) {
+                tagArr = [...new Set(article.context.flatMap(block => block.tag || []))];
+            }
+        } else if (generalArticleIndex != null) {
+            const generalArticle = categoryData?.[categoryIndex]?.generalArticle?.[generalArticleIndex];
+            if (Array.isArray(generalArticle?.artContext)) {
+                tagArr = [...new Set(generalArticle.artContext.flatMap(block => block.tag || []))];
+            }
+        }
+        setTags(
+            tagArr.filter(tag => typeof tag === "string" && tag.trim() !== "").map(tag => tag.trim())
+        );
+    }, [selectedArticle, categoryData]);
 
     const handleReset = () => {
         setTagInput("");
     }
+
+    const updateTagsInJSON = (tagsToSave, action) => {
+        setCategoryData((prevData) => {
+            const newData = JSON.parse(JSON.stringify(prevData));
+
+            let articleBlocks = [];
+
+            if (folderIndex != null && articleIndex != null) {
+                articleBlocks = newData[categoryIndex].folder[folderIndex].article[articleIndex].context;
+            } else if (generalArticleIndex != null) {
+                articleBlocks = newData[categoryIndex].generalArticle[generalArticleIndex].artContext;
+            }
+
+            articleBlocks.forEach(block => {
+                if (!Array.isArray(block.tag)) block.tag = [];
+                if (action === "add" && !block.tag.includes(tagsToSave)) {
+                    block.tag.push(tagsToSave);   // add tag
+                } else if (action === "remove") {
+                    block.tag = block.tag.filter(t => t !== tagsToSave); // remove tag
+                }
+            });
+
+            return newData;
+        });
+    };
+
+    const handleSelectTag = (tag) => {
+        if (!tag) return;
+        if (!tags.includes(tag)) {
+            const newTags = [...tags, tag];
+            setTags(newTags);
+            updateTagsInJSON(tag, "add");
+        }
+        setTagInput("");
+    };
+
+    const filteredTags = tags.filter(
+        tag => typeof tag === "string" && tag.toLowerCase().includes(tagInput.toLowerCase())
+    );
+
+
+    const handleRemoveTag = (tagToRemove) => {
+        setTags((prev) => prev.filter((t) => t !== tagToRemove));
+        updateTagsInJSON(tagToRemove, "remove");
+    };
 
     if (!selectedArticle || (selectedArticle.articleIndex === null && selectedArticle.generalArticleIndex === null)) {
         return (
@@ -27,97 +127,226 @@ const ArticleDocx = ({ categoryData, selectedArticle }) => {
         const article = categoryData?.[categoryIndex]?.folder?.[folderIndex]?.article?.[articleIndex];
         articleTitle = article?.title || "Untitled Article";
         articleContent = Array.isArray(article?.context) ? article.context : [];
+        console.log(articleContent.length, 'ArticleContent')
+        console.log(articleContent, 'ArticleContent')
+
     } else if (generalArticleIndex != null) {
         const generalArticle = categoryData?.[categoryIndex]?.generalArticle?.[generalArticleIndex];
         articleTitle = generalArticle?.artTitle || "Untitled Article";
         articleContent = Array.isArray(generalArticle?.artContext) ? generalArticle.artContext : [];
     }
 
+
     return (
-        <div className="flex-1 h-full w-full p-6 bg-gray-50 overflow-y-auto border-l border-gray-200">
-            <div className={`relative group px-10 ${openTagInput ? 'w-full' : 'w-fit'}`}>
-                {!openTagInput && (
-                    <div
-                        onClick={() => setOpenTagInput(true)}
-                        className="flex items-center gap-2 pb-1 text-xs text-gray-400 group-hover:opacity-100 opacity-0 cursor-pointer">
-                        <i className="fa-solid fa-tags"></i>
-                        <p>Add Tags</p>
-                    </div>
-                )}
-
-                {/* SEARCH TAG BAR */}
-                {openTagInput && (
-                    <div className="relative flex gap-2 max-sm:mr-0 mb-1">
-
-                        <input type="text" placeholder='Search settings'
-                            value={tagInput}
-                            onChange={(e) => setTagInput(e.target.value)}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            className='border border-gray-400 w-full text-sm mt-2 py-1 px-3 rounded focus:outline-green-500 focus:border-green-500 hover:border-green-500'
-                        />
-                        {isFocused ?
-                            <i className="fa-solid fa-magnifying-glass text-xs text-gray-400 absolute top-4 right-2"></i> :
-                            <i className="fa-solid fa-chevron-down text-xs text-gray-400 absolute top-4 right-2"></i>
-                        }
-
-                        <div onClick={() => { handleReset(); setOpenTagInput(false) }} className="flex-items-2 items-center w-6 h-6 absolute top-3 -right-7">
-                            <i className="fa-regular fa-circle-xmark text-black"></i>
+        <div className="h-auto relative flex-1 w-full bg-gray-50 border-l border-gray-200">
+            <div className="flex-1 overflow-y-auto absolute p-5 w-[-webkit-fill-available] h-[-webkit-fill-available]">
+                <div className={`relative group px-10 ${openTagInput ? 'w-full' : 'w-fit'}`} ref={tagInputRef}>
+                    {!openTagInput && tags.length === 0 ? (
+                        <div
+                            onClick={() => setOpenTagInput(true)}
+                            className="flex items-center gap-2 pb-1 text-xs text-gray-400 group-hover:opacity-100 opacity-0 cursor-pointer">
+                            <i className="fa-solid fa-tags"></i>
+                            <p>Add Tags</p>
                         </div>
+                    ) : (!openTagInput && (
+                        <div className="flex items-center mb-6">
+                            {tags.map((tag, i) => (
+                                <span
+                                    key={i}
+                                    className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded text-xs mr-1 border border-green-500"
+                                >
 
-                        <div className={`absolute w-full flex-items gap-1! flex-col justify-center text-gray-400 min-h-24 top-11 shadow-6 bg-white rounded origin-top transition-all duration-300 ease-out ${isFocused ?
-                            'opacity-100 translate-y-0 scale-100 z-10 visible' :
-                            'opacity-0 -translate-y-2 scale-100 z-0 invisible'}`}>
-                            <i className="fa-solid fa-inbox text-3xl"></i>
-                            <p>No Data</p>
+                                    <i className="fa-solid fa-tags cursor-pointer"></i>
+
+                                    {tag}
+                                </span>
+                            ))}
+                            <div onClick={() => setOpenTagInput(true)} className="cursor-pointer">
+                                <i className="fa-solid fa-pencil text-gray-400 ml-2"></i>
+                            </div>
                         </div>
+                    ))}
+
+                    {/* SEARCH TAG BAR */}
+                    {openTagInput && (
+                        <div className="relative flex gap-2 max-sm:mr-0 mb-1">
+                            <div className={`flex flex-wrap items-center border border-gray-400 w-full text-sm mt-2 mb-8 px-2 rounded focus-within:border-green-500 hover:border-green-500`}
+                                onClick={() => setIsFocused(!isFocused)}
+                            >
+                                {tags.map((tag, i) => (
+                                    <span
+                                        key={i}
+                                        className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded text-xs mr-1"
+                                    >
+                                        {tag}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // setTags(tags.filter((_, index) => index !== i));
+                                                const tagToRemove = tags[i];
+                                                setTags(tags.filter((_, index) => index !== i));
+                                                updateTagsInJSON(tagToRemove, "remove");
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-xmark text-[10px]"></i>
+                                        </button>
+                                    </span>
+                                ))}
+
+                                <input
+                                    type="text"
+                                    placeholder={tags.length === 0 ? "Search settings" : ""}
+                                    value={tagInput}
+                                    onChange={(e) => setTagInput(e.target.value)}
+                                    // onFocus={() => setIsFocused(true)}
+                                    // onBlur={() => setIsFocused(false)}
+                                    className="flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]"
+                                />
+                            </div>
+
+                            {isFocused ?
+                                <i className="fa-solid fa-magnifying-glass text-xs text-gray-400 absolute top-4 right-2"></i> :
+                                <i className="fa-solid fa-chevron-down text-xs text-gray-400 absolute top-4 right-2"></i>
+                            }
+
+                            <div onClick={() => { handleReset(); setOpenTagInput(false) }} className="flex-items-2 items-center w-6 h-6 absolute top-3 -right-7 cursor-pointer">
+                                <i className="fa-regular fa-circle-xmark text-black"></i>
+                            </div>
+
+                            <div
+                                ref={dropdownRef}
+                                className={`absolute w-full flex-items gap-1! flex-col justify-center text-gray-400 top-11 shadow-6 bg-white rounded origin-top transition-all duration-300 ease-out ${isFocused ?
+                                    'opacity-100 translate-y-0 scale-100 z-10 visible' :
+                                    'opacity-0 -translate-y-2 scale-100 z-0 invisible'}`}
+                            >
+                                {tagInput.length === 0 && tags.length === 0 ? (
+                                    <div className="flex flex-col items-center py-6">
+                                        <i className="fa-solid fa-inbox text-3xl mb-1"></i>
+                                        <p>No Data</p>
+                                    </div>
+                                ) : (
+                                    <div className="w-full text-left py-0.5 px-1">
+                                        {tagInput.trim() !== "" && (
+                                            <div onMouseDown={() => handleSelectTag(tagInput.trim())}
+                                                className="py-1 px-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700 rounded"
+                                            >
+                                                {tagInput}
+                                            </div>
+                                        )}
+
+                                        {tags.length > 0 && (
+                                            <>
+                                                {filteredTags.map((tag, i) => (
+                                                    <div key={i}
+                                                        onMouseDown={(e) => {
+                                                            // prevent input blur while removing
+                                                            e.preventDefault();
+                                                            handleRemoveTag(tag);
+                                                        }}
+                                                        className="py-1 px-2 my-0.5 flex items-center justify-between bg-green-100 rounded text-sm text-gray-700 cursor-pointer">
+                                                        <span>{tag}</span>
+
+                                                        <button
+
+                                                            className="text-xs text-red-500 ml-2"
+                                                        >
+                                                            ✕
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+
+
+                    <div className="mb-8 w-full">
+                        {isEditingTitle ? (
+                            <input
+                                ref={titleInputRef}
+                                type="text"
+                                value={editTitleValue}
+                                onChange={(e) => setEditTitleValue(e.target.value)}
+                                onBlur={() => {
+                                    if (editTitleValue.trim() !== "") {
+                                        if (folderIndex != null && articleIndex != null) {
+                                            // Normal article
+                                            handleEditArticleName(categoryIndex, folderIndex, articleIndex, editTitleValue);
+                                        } else if (generalArticleIndex != null) {
+                                            // General article
+                                            handleEditGeneralArtilceName(categoryIndex, generalArticleIndex, editTitleValue);
+                                        }
+                                    }
+                                    setIsEditingTitle(false);
+                                }}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.target.blur(); // triggers onBlur
+                                    }
+                                }}
+                                className="text-3xl font-semibold w-full outline-none bg-transparent text-gray-900"
+                            />
+                        ) : (
+                            <h2
+                                className="text-3xl font-semibold mb-2 text-gray-900 cursor-text"
+                                onClick={() => {
+                                    setIsEditingTitle(true);
+                                    setEditTitleValue(articleTitle);
+                                }}
+                            >
+                                {articleTitle}
+                                {/* <i className="fa-solid fa-pencil text-gray-400 text-sm ml-2 opacity-0 group-hover:opacity-100"></i> */}
+                            </h2>
+                        )}
                     </div>
-                )}
 
 
+                </div>
 
-                <h2 className="text-3xl font-semibold my-8 text-gray-900">{articleTitle}</h2>
-
-            </div>
-            <div className="prose max-w-none mt-10">
-                {articleContent.length > 0
-                    ? articleContent.map((block, index) => (
-                        <ContentBlock key={index} block={block} />
-                    ))
-                    : <p>Start writing your article here by typing /</p>}
+                <div className="prose max-w-none mt-10">
+                    {articleContent.length > 0
+                        ? articleContent.map((block, index) => (
+                            // <ContentBlock key={index} block={block} />
+                            <EditableArticle key={index} />
+                            // <SlateEditor key={index} />
+                        ))
+                        : <p>Start writing your article here by typing /</p>}
+                </div>
             </div>
         </div>
     );
 };
 
-/**
- * 🧩 Component to render individual content blocks
- * Each block could be: heading, paragraph, ordered list, unordered list, etc.
- */
+
+
 const ContentBlock = ({ block }) => {
     if (!block || !block.type) return null;
-
     switch (block.type) {
         case "heading":
             return <h3 className="text-xl font-bold mt-4 mb-2">{block.content}</h3>;
-
         case "paragraph":
             return <p className="mb-2 leading-relaxed">{block.content}</p>;
-
         case "ordered-list":
             return (
                 <ol className="list-decimal list-inside mb-3">
-                    {block.items?.map((item, i) => <li key={i}>{item}</li>)}
+                    {block.items?.map((item, i) => (
+                        <li key={i}>{item}</li>
+                    ))}
                 </ol>
             );
-
         case "unordered-list":
             return (
                 <ul className="list-disc list-inside mb-3">
-                    {block.items?.map((item, i) => <li key={i}>{item}</li>)}
+                    {block.items?.map((item, i) => (
+                        <li key={i}>{item}</li>
+                    ))}
                 </ul>
             );
-
         default:
             return <p>{block.content || "Unsupported block type"}</p>;
     }

@@ -966,7 +966,8 @@ const Knowledge = ({ dataCategory }) => {
 
                     <button
                         className={`h-10 border bg-green-500 hover:bg-green-600 px-4 text-sm rounded-3xl text-white ${dataCategory === categoryData ? "cursor-not-allowed!" : "cursor-pointer"}`}
-                        onClick={() => { if (dataCategory !== categoryData) { handleSaveType("publish") } }}
+                        // onClick={() => { if (dataCategory !== categoryData) { handleSaveType("publish") } }}
+                        onClick={() => { handleSaveType("publish") }}
                     >
                         Save & Publish
                     </button>
@@ -1293,7 +1294,10 @@ const Knowledge = ({ dataCategory }) => {
                 {/* Right Area */}
                 <ArticleDocx
                     categoryData={categoryData}
+                    setCategoryData={setCategoryData}
                     selectedArticle={selectedArticle}
+                    handleEditArticleName={handleEditArticleName}
+                    handleEditGeneralArtilceName={handleEditGeneralArtilceName}
                 />
             </div>
 

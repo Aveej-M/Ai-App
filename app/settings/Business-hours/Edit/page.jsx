@@ -279,10 +279,10 @@ const page = () => {
                                 <tbody className="bg-gray-100">
                                     {holidayTable.map(({ name, date, more }, index) => (
                                         <tr key={index}>
-                                            <td className="text-center">{name}</td>
-                                            <td className="text-center">{date}</td>
+                                            <td className="td text-center">{name}</td>
+                                            <td className="td text-center">{date}</td>
                                             <td
-                                                className="text-center cursor-pointer relative group"
+                                                className="td text-center cursor-pointer relative group"
                                                 onClick={() => { setDeleteIndex(index); setShowDelete(!showDelete); }}
                                             >{more}
                                                 <div className="absolute bg-black/90 text-white text-[13px] font-[100] rounded -top-8 right-5 px-3 py-1 hidden group-hover:block transition-all duration-300 ease-in-out">Delete</div>
@@ -298,12 +298,12 @@ const page = () => {
                                     ))}
                                     {holidayTable.length === 0 && (
                                         <tr className="h-50 w-full">
-                                            <td className="border-b-0!"></td>
-                                            <td className="text-center text-gray-400 border-b-0!">
+                                            <td className="td border-b-0!"></td>
+                                            <td className="td text-center text-gray-400 border-b-0!">
                                                 <i className="fa-regular fa-folder-open text-5xl"></i>
                                                 <p>No data</p>
                                             </td>
-                                            <td className="border-b-0!"></td>
+                                            <td className="td border-b-0!"></td>
                                         </tr>
                                     )}
 

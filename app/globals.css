@@ -393,7 +393,7 @@ details[open] .drop {
 /* th:last-child{
   border-right: none;
 } */
-td {
+.td {
   border-bottom: solid 1px var(--color-gray-400);
   padding: 5px 10px 5px 10px;
 }
