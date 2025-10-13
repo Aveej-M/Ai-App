@@ -1,138 +1,79 @@
-// 'use client';
-// import React, { useCallback, useMemo, useState } from 'react';
-// import { createEditor, Transforms, Element as SlateElement } from 'slate';
-// import { Slate, Editable, withReact } from 'slate-react';
+'use client';
+import { useEffect, useRef } from 'react';
 
-// const LIST_TYPES = ['numbered-list', 'bulleted-list'];
+export default function EditableArticle({ content }) {
+    const editorRef = useRef(null);
+    const editorHolderRef = useRef(null);
+    const holderId = `editorjs-${Math.random().toString(36).substring(2, 9)}`;
 
-// export default function SlateEditor() {
-//     const editor = useMemo(() => withReact(createEditor()), []);
-//     const [value, setValue] = useState([
-//         {
-//             type: 'paragraph',
-//             children: [{ text: '' }],
-//         },
-//     ]);
+    useEffect(() => {
+        let EditorJS;
+        let Header;
+        let List;
+        let Table;
+        let ImageTool;
 
-//     const renderElement = useCallback((props) => <Element {...props} />, []);
-//     const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
+        const loadEditor = async () => {
+            EditorJS = (await import('@editorjs/editorjs')).default;
+            Header = (await import('@editorjs/header')).default;
+            List = (await import('@editorjs/list')).default;
+            Table = (await import('@editorjs/table')).default;
+            ImageTool = (await import('@editorjs/image')).default;
+            if (!editorRef.current && editorHolderRef.current) {
+                editorRef.current = new EditorJS({
+                    holder: editorHolderRef.current,
+                    autofocus: true,
+                    placeholder: 'Start writing your article here...',
+                    /**
+                     * Important: start with empty data explicitly
+                     */
+                    data: {
+                        blocks: [
+                            { type: 'paragraph', data: { text: '' } }
+                        ]
+                    },
+                    tools: {
+                        header: {
+                            class: Header,
+                            inlineToolbar: ['bold', 'italic'],
+                            // config: {
+                            //     levels: [1, 2, 3, 4, 5, 6], // h1, h2, h3, h4
+                            //     defaultLevel: 2,
+                            // }
+                        },
 
-//     const toggleBlock = (editor, format) => {
-//         const isActive = isBlockActive(editor, format);
-//         const isList = LIST_TYPES.includes(format);
+                        list: { class: List, inlineToolbar: true },
+                        // checklist: { class: Checklist, inlineToolbar: true },
+                        table: { class: Table, inlineToolbar: true },
+                        image: {
+                            class: ImageTool,
+                            config: {
+                                uploader: {
+                                    uploadByFile: async (file) => {
+                                        const url = URL.createObjectURL(file);
+                                        return { success: 1, file: { url } };
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        };
 
-//         Transforms.unwrapNodes(editor, {
-//             match: (n) =>
-//                 LIST_TYPES.includes(!SlateElement.isElement(n) ? n.type : n.type),
-//             split: true,
-//         });
+        loadEditor();
 
-//         let newType = isActive ? 'paragraph' : isList ? 'list-item' : format;
+        return () => {
+            if (editorRef.current && typeof editorRef.current.destroy === 'function') {
+                editorRef.current.destroy();
+                editorRef.current = null;
+            }
+        };
+    }, [content, holderId]);
 
-//         Transforms.setNodes(editor, { type: newType });
-
-//         if (!isActive && isList) {
-//             const block = { type: format, children: [] };
-//             Transforms.wrapNodes(editor, block);
-//         }
-//     };
-
-//     const isBlockActive = (editor, format) => {
-//         const [match] = Array.from(
-//             SlateEditor.Editor.nodes(editor, {
-//                 match: (n) => SlateElement.isElement(n) && n.type === format,
-//             })
-//         );
-//         return !!match;
-//     };
-
-//     return (
-//         <div className="p-6 bg-gray-50 min-h-screen">
-//             {/* Toolbar */}
-//             <div className="flex gap-2 mb-4">
-//                 <button onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, 'paragraph'); }}>
-//                     Text
-//                 </button>
-//                 <button onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, 'heading'); }}>
-//                     Heading
-//                 </button>
-//                 <button onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, 'bulleted-list'); }}>
-//                     UL
-//                 </button>
-//                 <button onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, 'numbered-list'); }}>
-//                     OL
-//                 </button>
-//                 <button onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, 'checklist'); }}>
-//                     Checklist
-//                 </button>
-//                 <button onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, 'table'); }}>
-//                     Table
-//                 </button>
-//                 <button onMouseDown={(e) => { e.preventDefault(); toggleBlock(editor, 'image'); }}>
-//                     Image
-//                 </button>
-//             </div>
-
-//             <Slate
-//                 editor={editor}
-//                 value={value}
-//                 onChange={(newValue) => setValue(newValue)}
-//             >
-//                 <Editable
-//                     renderElement={renderElement}
-//                     renderLeaf={renderLeaf}
-//                     placeholder="Start writing your article here..."
-//                 />
-//             </Slate>
-//         </div>
-//     );
-// }
-
-// const Element = ({ attributes, children, element }) => {
-//     switch (element.type) {
-//         case 'heading':
-//             return <h2 {...attributes} className="text-xl font-semibold mb-2">{children}</h2>;
-//         case 'bulleted-list':
-//             return <ul {...attributes} className="list-disc list-inside">{children}</ul>;
-//         case 'numbered-list':
-//             return <ol {...attributes} className="list-decimal list-inside">{children}</ol>;
-//         case 'checklist':
-//             return (
-//                 <div {...attributes} className="flex items-center gap-2 mb-2">
-//                     <input type="checkbox" />
-//                     <span>{children}</span>
-//                 </div>
-//             );
-//         case 'table':
-//             return (
-//                 <table {...attributes} className="table-auto border border-gray-300 mb-2">
-//                     <tbody>{children}</tbody>
-//                 </table>
-//             );
-//         case 'table-row':
-//             return <tr {...attributes}>{children}</tr>;
-//         case 'table-cell':
-//             return <td {...attributes} className="border px-2 py-1">{children}</td>;
-//         case 'image':
-//             return (
-//                 <div {...attributes} className="mb-2">
-//                     <input type="file" accept="image/*" onChange={(e) => {
-//                         const file = e.target.files[0];
-//                         if (!file) return;
-//                         const reader = new FileReader();
-//                         reader.addEventListener('load', () => {
-//                             const img = { type: 'image-element', url: reader.result, children: [{ text: '' }] };
-//                             SlateEditor.Editor.insertNodes(editor, img);
-//                         });
-//                         reader.readAsDataURL(file);
-//                     }} />
-//                 </div>
-//             );
-//         default:
-//             return <p {...attributes}>{children}</p>;
-//     }
-// };
-
-// const Leaf = ({ attributes, children }) => {
-//     return <span {...attributes}>{children}</span>;
-// };
+    return (
+        <div className="relative w-full">
+            <div ref={editorHolderRef} className="min-h-[250px] focus:outline-none" />
+        </div>
+    );
+}

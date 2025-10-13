@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 
 const blockTypes = [
     { icon: <i className="fa-solid fa-t"></i>, label: 'Text', type: 'paragraph' },
@@ -12,6 +12,13 @@ const blockTypes = [
 ];
 
 export default function NotionEditor() {
+    const convertTypes = [
+        { icon: <i className="fa-solid fa-right-left rotate-45"></i>, label: 'Convert', type: 'paragraph' },
+        { icon: <i className="fa-solid fa-angle-up"></i>, label: 'Move up', type: 'paragraph' },
+        { icon: <i className="fa-solid fa-xmark"></i>, label: 'Delete', type: 'paragraph' },
+        { icon: <i className="fa-solid fa-angle-down"></i>, label: 'Move down', type: 'paragraph' },
+    ];
+
     const [blocks, setBlocks] = useState([{ type: 'paragraph', content: '' }]);
     const [showMenu, setShowMenu] = useState(false);
     const [filter, setFilter] = useState('');
@@ -20,6 +27,9 @@ export default function NotionEditor() {
     const [focusIndex, setFocusIndex] = useState(null);
     const [openAlignColumn, setOpenAlignColumn] = useState(false);
     const [columnIdx, setColumnIdx] = useState(null);
+    const [deleteSure, setDeleteSure] = useState(false);
+    const [convertMenu, setConvertMenu] = useState(false);
+    const [showHeading, setShowHeading] = useState(false);
 
     const menuRef = useRef(null);
     const inputRefs = useRef({});
@@ -32,6 +42,7 @@ export default function NotionEditor() {
                 !e.target.closest('.align-column-trigger') // ⛔ ignore clicks on trigger
             ) {
                 setShowMenu(false);
+                setConvertMenu(false);
                 setOpenAlignColumn(false);
                 setColumnIdx(null);
             }
@@ -77,6 +88,41 @@ export default function NotionEditor() {
         const currentIndex = refKeyList.indexOf(currentKey);
         if (currentIndex === -1) return;
 
+        const focusInput = (key) => {
+            setTimeout(() => {
+                if (inputRefs.current[key]) inputRefs.current[key].focus();
+            }, 0);
+        };
+
+        // 🧩 Check if it's a table key (example: "2-1-3" -> block 2, row 1, col 3)
+        const keyParts = currentKey.split("-");
+        const isTableKey = keyParts.length === 3;
+
+        if (isTableKey) {
+            const [blockIdx, rowIdx, colIdx] = keyParts.map(Number);
+
+            // Move between table cells
+            if (e.key === "ArrowRight") {
+                e.preventDefault();
+                const nextKey = `${blockIdx}-${rowIdx}-${colIdx + 1}`;
+                if (inputRefs.current[nextKey]) focusInput(nextKey);
+            } else if (e.key === "ArrowLeft") {
+                e.preventDefault();
+                const prevKey = `${blockIdx}-${rowIdx}-${colIdx - 1}`;
+                if (inputRefs.current[prevKey]) focusInput(prevKey);
+            } else if (e.key === "ArrowDown") {
+                e.preventDefault();
+                const nextRowKey = `${blockIdx}-${rowIdx + 1}-${colIdx}`;
+                if (inputRefs.current[nextRowKey]) focusInput(nextRowKey);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                const prevRowKey = `${blockIdx}-${rowIdx - 1}-${colIdx}`;
+                if (inputRefs.current[prevRowKey]) focusInput(prevRowKey);
+            }
+            // return; // ✅ Stop here (don’t run normal block navigation)
+        }
+
+        // 🧱 Default behavior for paragraphs, lists, etc.
         if (e.key === 'ArrowDown') {
             e.preventDefault();
             const nextKey = refKeyList[currentIndex + 1];
@@ -87,6 +133,7 @@ export default function NotionEditor() {
             if (prevKey) focusInput(prevKey);
         }
     };
+
 
     const handleChange = (index, value) => {
         const newBlocks = [...blocks];
@@ -125,31 +172,70 @@ export default function NotionEditor() {
 
     const handleSelectType = (type) => {
         if (activeIndex === null) return;
+
+        // We'll compute new blocks immutably
         const newBlocks = [...blocks];
-        switch (type) {
-            case 'ordered-list':
-            case 'unordered-list':
-                newBlocks[activeIndex] = { type, items: [''] };
-                break;
-            case 'table':
-                newBlocks[activeIndex] = { type, rows: [['', ''], ['', '']] };
-                break;
-            case 'checklist':
-                newBlocks[activeIndex] = { type, items: [{ content: '', checked: false }] };
-                break;
-            case 'image':
-                newBlocks[activeIndex] = { type, file: null, preview: '' };
-                setTimeout(() => {
-                    const input = document.getElementById(`image-input-${activeIndex}`);
-                    if (input) input.click();
-                }, 50);
-                break;
-            default:
-                newBlocks[activeIndex] = { type, content: '' };
+        const current = newBlocks[activeIndex];
+
+        // Should we replace current block?
+        const shouldReplace =
+            current &&
+            current.type === 'paragraph' &&
+            (current.content || '').trim() === '';
+
+        // Create a factory to build a new block by type
+        const makeBlock = (t) => {
+            switch (t) {
+                case 'ordered-list':
+                case 'unordered-list':
+                    return { type: t, items: [''] };
+                case 'table':
+                    return { type: t, rows: [['', ''], ['', '']] };
+                case 'checklist':
+                    return { type: t, items: [{ content: '', checked: false }] };
+                case 'image':
+                    return { type: t, file: null, preview: '' };
+                default:
+                    return { type: t, content: '' };
+            }
+        };
+
+        let targetIndex = activeIndex;
+
+        if (shouldReplace) {
+            // Replace the current (empty paragraph) with the new block
+            newBlocks[targetIndex] = makeBlock(type);
+        } else {
+            // Insert new block AFTER the activeIndex
+            targetIndex = activeIndex + 1;
+            newBlocks.splice(targetIndex, 0, makeBlock(type));
         }
+
         setBlocks(newBlocks);
         setShowMenu(false);
-        focusInput(`${activeIndex}-0`);
+
+        // If we inserted/replaced an image we want to open file picker after DOM update
+        if (type === 'image') {
+            // Wait for the input to exist in DOM
+            setTimeout(() => {
+                const input = document.getElementById(`image-input-${targetIndex}`);
+                if (input) input.click();
+            }, 50);
+        }
+
+        // Set new active index and focus the correct input key
+        setActiveIndex(targetIndex);
+
+        // Focus keys vary by block type:
+        // - table -> `${idx}-0-0`
+        // - lists/checklist -> `${idx}-0`
+        // - others -> `${idx}`
+        setTimeout(() => {
+            if (type === 'table') focusInput(`${targetIndex}-0-0`);
+            else if (type === 'ordered-list' || type === 'unordered-list' || type === 'checklist')
+                focusInput(`${targetIndex}-0`);
+            else focusInput(`${targetIndex}`);
+        }, 0);
     };
 
     const handleKeyDown = (e, index) => {
@@ -176,6 +262,10 @@ export default function NotionEditor() {
         bt.label.toLowerCase().includes(filter.toLowerCase())
     );
 
+    const filteredTunes = convertTypes.filter((tu) =>
+        tu.label.toLocaleLowerCase().includes(filter.toLowerCase())
+    );
+
     const toggleMenu = (index) => {
         setOpenAlignColumn((prev) => {
             // if clicking the same column, close the menu
@@ -195,23 +285,104 @@ export default function NotionEditor() {
         // Show plus icon if this block is focused or hovered
         const showPlus = focusIndex === index || hoveredIndex === index;
         const plusIcon = (
-            <div
-                className={`flex gap-2 text-gray-600 transition-opacity duration-150 ${showPlus ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
-            >
-                <i
-                    className="fa-solid fa-plus cursor-pointer"
-                    onClick={() => {
-                        setShowMenu(true);
-                        setActiveIndex(index);
-                    }}
-                ></i>
+            <div>
+                <div
+                    className={`flex items-center gap-2 text-gray-600 transition-opacity duration-150 ${showPlus ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+                >
+                    <i
+                        className="fa-solid fa-plus cursor-pointer"
+                        onClick={() => {
+                            setShowMenu(!showMenu);
+                            setActiveIndex(index);
+                            setFocusIndex(index);
+                        }}
+                    ></i>
+
+                    <div className="flex py-1 px-1.5 rounded hover:bg-gray-200 gap-0.5 text-gray-400 cursor-pointer hover:text-black h-fit"
+                        onClick={() => {
+                            setConvertMenu(!convertMenu);
+                            setActiveIndex(index);
+                            setFocusIndex(index);
+                        }}
+                    >
+                        <i className="fa-solid fa-ellipsis-vertical"></i>
+                        <i className="fa-solid fa-ellipsis-vertical"></i>
+                    </div>
+
+
+                </div>
+                {showMenu && activeIndex === index && (
+                    <div
+                        ref={menuRef}
+                        className="absolute top-5 left-5 w-64 bg-white shadow-lg rounded-lg border border-gray-200 p-2 z-50"
+                    >
+                        <div className="flex items-center border-b border-gray-300 pb-1 px-2 mb-1">
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                            <input
+                                type="text"
+                                placeholder="Filter"
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                className="w-full px-2 py-1 text-sm outline-none"
+                            />
+                        </div>
+                        <div className="max-h-48 overflow-y-auto">
+                            {filteredTypes.map((bt, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => handleSelectType(bt.type)}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+                                >
+                                    {bt.icon}
+                                    <span>{bt.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {convertMenu && activeIndex === index && (
+                    <div
+                        ref={menuRef}
+                        className="absolute top-5 left-10 w-64 bg-white shadow-lg rounded-lg border border-gray-200 p-2 z-50"
+                    >
+                        <div className="flex items-center border-b border-gray-300 pb-1 px-2 mb-1">
+                            <i className="fa-solid fa-magnifying-glass"></i>
+                            <input
+                                type="text"
+                                placeholder="Filter"
+                                value={filter}
+                                onChange={(e) => setFilter(e.target.value)}
+                                className="w-full px-2 py-1 text-sm outline-none"
+                            />
+                        </div>
+                        <div className="max-h-48 overflow-y-auto">
+                            {filteredTunes.map((tu, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => handleSelectType(tu.type)}
+                                    className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm text-gray-700"
+                                >
+                                    {tu.icon}
+                                    <span>{tu.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
         );
 
         // build ref key list for navigation
         const refKeyList = [];
         blocks.forEach((b, bIdx) => {
-            if (b.type === 'unordered-list' || b.type === 'ordered-list') {
+            if (b.type === 'table') {
+                b.rows.forEach((r, rIdx) => {
+                    r.forEach((_, cIdx) => {
+                        refKeyList.push(`${bIdx}-${rIdx}-${cIdx}`);
+                    });
+                });
+            } else if (b.type === 'unordered-list' || b.type === 'ordered-list') {
                 (b.items || []).forEach((_, i) => refKeyList.push(`${bIdx}-${i}`));
             } else if (b.type === 'checklist') {
                 (b.items || []).forEach((_, i) => refKeyList.push(`${bIdx}-${i}`));
@@ -305,11 +476,11 @@ export default function NotionEditor() {
                     return prev;
                 }
 
-                const colCount = tableBlock.rows[0].length;
-                if (colCount <= 1) {
-                    alert("You must have at least one column.");
-                    return prev; // prevent deleting last column
-                }
+                // const colCount = tableBlock.rows[0].length;
+                // if (colCount <= 1) {
+                //     alert("You must have at least one column.");
+                //     return prev; // prevent deleting last column
+                // }
 
                 // Remove the column at colIndex for all rows
                 tableBlock.rows = tableBlock.rows.map(row => {
@@ -348,7 +519,7 @@ export default function NotionEditor() {
             case 'ordered-list':
                 return (
                     <div key={index} {...blockWrapperProps} className="mb-2 relative flex items-start gap-3 group">
-                        <span className="mt-1">{plusIcon}</span>
+                        <span>{plusIcon}</span>
                         <div>
                             {(block.items || []).map((item, i) => (
                                 <div key={i} className="flex items-center gap-2 mb-1">
@@ -423,9 +594,10 @@ export default function NotionEditor() {
 
             case 'table':
                 return (
-                    <div key={index} {...blockWrapperProps} className="relative flex gap-6 mb-2 group text-start">
+                    <div key={index} {...blockWrapperProps} className="relative flex gap-1 mb-2 group text-start">
                         <span className="mt-1">{plusIcon}</span>
-                        <div className='w-full flex flex-col items-start relative'>
+
+                        <div className='w-full flex flex-col items-start relative right-4'>
                             <table className="w-full table-auto flex-1 overflow-x-scroll">
                                 <thead>
                                     <tr className="relative">
@@ -485,17 +657,27 @@ export default function NotionEditor() {
                                                                 <i className="text-gray-500 fa-solid fa-turn-down shadow-11 px-1.5 rounded py-1 bg-white"></i>
                                                                 <h1 className='text-sm text-gray-500'>Add Columns to Right</h1>
                                                             </div>
-                                                            <div className='flex items-center justify-start gap-3 p-1 pr-3 rounded w-full hover:bg-gray-200 my-0.5 cursor-pointer'
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleDeleteColumn(index, colIndex);
-                                                                    setOpenAlignColumn(false);
-                                                                    setColumnIdx(null);
-                                                                }}
-                                                            >
-                                                                <i className="text-gray-500 fa-solid fa-xmark shadow-11 px-1.5 rounded py-1 bg-white"></i>
-                                                                <h1 className='text-sm text-gray-500'>Delete Columns</h1>
-                                                            </div>
+                                                            {!deleteSure ? (
+                                                                <div className='flex items-center justify-start gap-3 p-1 pr-3 rounded w-full hover:bg-gray-200 my-0.5 cursor-pointer'
+                                                                    onClick={(e) => setDeleteSure(true)}
+                                                                >
+                                                                    <i className="text-gray-500 fa-solid fa-xmark shadow-11 px-1.5 rounded py-1 bg-white"></i>
+                                                                    <h1 className='text-sm text-gray-500'>Delete Columns</h1>
+                                                                </div>
+                                                            ) : (
+                                                                <div className={`items-center justify-start gap-3 p-1 pr-3 rounded w-full bg-red-500  my-0.5 cursor-pointer ${block.rows[0].length <= 1 ? "hidden" : "flex"}`}
+                                                                    onClick={(e) => {
+                                                                        setDeleteSure(false);
+                                                                        e.stopPropagation();
+                                                                        handleDeleteColumn(index, colIndex);
+                                                                        setOpenAlignColumn(false);
+                                                                        setColumnIdx(null);
+                                                                    }}
+                                                                >
+                                                                    <i className="text-gray-500 fa-solid fa-xmark shadow-11 px-1.5 rounded py-1 bg-white"></i>
+                                                                    <h1 className='text-sm text-white'>Delete Columns</h1>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     )}
 
@@ -521,8 +703,9 @@ export default function NotionEditor() {
                                                 </div></td>
 
                                             {row.map((cell, cellIndex) => (
-                                                <td key={cellIndex} className={`border first:border-l-0 last:border-r-0 group/col px-2 py-1 border-gray-300 ${columnIdx !== null && columnIdx === cellIndex ? "bg-gray-200" : ""}`}>
+                                                <td key={cellIndex} className={`border border-l-0 last:border-r-0 group/col px-2 py-1 border-gray-300 ${columnIdx !== null && columnIdx === cellIndex ? "bg-gray-200" : ""}`}>
                                                     <input
+                                                        placeholder={rowIndex === 0 && showHeading ? "Heading" : ""}
                                                         type="text"
                                                         className="w-full outline-none bg-transparent"
                                                         value={cell}
@@ -531,8 +714,8 @@ export default function NotionEditor() {
                                                             newBlocks[index].rows[rowIndex][cellIndex] = e.target.value;
                                                             setBlocks(newBlocks);
                                                         }}
-                                                        onKeyDown={(e) => handleNextLine(e, refKeyList, `${index}`)}
-                                                        ref={(el) => (inputRefs.current[`${index}`] = el)}
+                                                        onKeyDown={(e) => handleNextLine(e, refKeyList, `${index}-${rowIndex}-${cellIndex}`)}
+                                                        ref={(el) => (inputRefs.current[`${index}-${rowIndex}-${cellIndex}`] = el)}
                                                         onFocus={() => setFocusIndex(index)}
                                                         onBlur={() => setFocusIndex(null)}
                                                     />
@@ -552,10 +735,7 @@ export default function NotionEditor() {
                                                     <i className="fa-solid fa-plus text-gray-400 text-xs"></i>
                                                 )}
                                             </td>
-
-
                                         </tr>
-
                                     ))}
                                 </tbody>
                             </table>
@@ -633,11 +813,11 @@ export default function NotionEditor() {
                     </div>
                 );
 
-
             default:
                 return (
                     <div key={index} {...blockWrapperProps}>
                         {plusIcon}
+
                         <input
                             ref={(el) => (inputRefs.current[`${index}`] = el)}
                             className="w-full text-gray-800 outline-none border-none resize-none bg-transparent"
@@ -662,7 +842,7 @@ export default function NotionEditor() {
                 {blocks.map((block, index) => renderBlock(block, index))}
             </div>
 
-            {showMenu && (
+            {/* {showMenu && (
                 <div
                     ref={menuRef}
                     className="absolute top-16 left-20 w-64 bg-white shadow-lg rounded-lg border border-gray-200 p-2 z-50"
@@ -690,7 +870,7 @@ export default function NotionEditor() {
                         ))}
                     </div>
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

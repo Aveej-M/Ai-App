@@ -978,7 +978,7 @@ const Knowledge = ({ dataCategory }) => {
             <div className="flex-1 flex flex-row gap-2 relative">
                 {/* Left Area */}
                 <div className="w-[350px] min-w-[350px] relative bg-gray-200 flex flex-col h-auto">
-                    <div className="flex-1 absolute w-full overflow-y-auto p-5 h-full">
+                    <div className="flex-1 absolute w-full overflow-y-auto p-5 h-full scrollbar-color-2">
                         {categoryData.map(({ category, folder, generalArticle, type }, catIdx) => (
                             <div key={catIdx} className="border-b border-b-gray-300 mb-2">
                                 <div className="justify-items w-full group cursor-pointer mb-2"

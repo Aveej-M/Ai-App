@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import EditableArticle from "./editableArticle";
+// import EditableArticle from "./editableArticle";
+import EditableArticle from "./editibleArticle2";
 import SlateEditor from "./editibleArticle2";
 
 const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEditArticleName, handleEditGeneralArtilceName }) => {
@@ -139,7 +140,7 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
 
     return (
         <div className="h-auto relative flex-1 w-full bg-gray-50 border-l border-gray-200">
-            <div className="flex-1 overflow-y-auto absolute p-5 w-[-webkit-fill-available] h-[-webkit-fill-available]">
+            <div className="flex-1 overflow-y-auto absolute p-5 w-[-webkit-fill-available] h-[-webkit-fill-available]" style={{ scrollbarColor: 'var(--color-green-200) var(--color-gray-50)' }}>
                 <div className={`relative group px-10 ${openTagInput ? 'w-full' : 'w-fit'}`} ref={tagInputRef}>
                     {!openTagInput && tags.length === 0 ? (
                         <div
@@ -162,7 +163,7 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
                                 </span>
                             ))}
                             <div onClick={() => setOpenTagInput(true)} className="cursor-pointer">
-                                <i className="fa-solid fa-pencil text-gray-400 ml-2"></i>
+                                <i className="fa-solid fa-pencil text-gray-400 hover:text-green-500 transition-all ml-2"></i>
                             </div>
                         </div>
                     ))}
@@ -211,7 +212,7 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
                             }
 
                             <div onClick={() => { handleReset(); setOpenTagInput(false) }} className="flex-items-2 items-center w-6 h-6 absolute top-3 -right-7 cursor-pointer">
-                                <i className="fa-regular fa-circle-xmark text-black"></i>
+                                <i className="fa-regular fa-circle-xmark text-black hover:text-green-500 transition-all"></i>
                             </div>
 
                             <div
@@ -263,8 +264,6 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
                         </div>
                     )}
 
-
-
                     <div className="mb-8 w-full">
                         {isEditingTitle ? (
                             <input
@@ -304,52 +303,48 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
                             </h2>
                         )}
                     </div>
-
-
                 </div>
 
-                <div className="prose max-w-none mt-10">
+                <div className="prose max-w-none mt-10 ml-3">
                     {articleContent.length > 0
                         ? articleContent.map((block, index) => (
                             // <ContentBlock key={index} block={block} />
-                            <EditableArticle key={index} />
+                            <EditableArticle key={index} content={block} />
                             // <SlateEditor key={index} />
                         ))
                         : <p>Start writing your article here by typing /</p>}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
-
-
-const ContentBlock = ({ block }) => {
-    if (!block || !block.type) return null;
-    switch (block.type) {
-        case "heading":
-            return <h3 className="text-xl font-bold mt-4 mb-2">{block.content}</h3>;
-        case "paragraph":
-            return <p className="mb-2 leading-relaxed">{block.content}</p>;
-        case "ordered-list":
-            return (
-                <ol className="list-decimal list-inside mb-3">
-                    {block.items?.map((item, i) => (
-                        <li key={i}>{item}</li>
-                    ))}
-                </ol>
-            );
-        case "unordered-list":
-            return (
-                <ul className="list-disc list-inside mb-3">
-                    {block.items?.map((item, i) => (
-                        <li key={i}>{item}</li>
-                    ))}
-                </ul>
-            );
-        default:
-            return <p>{block.content || "Unsupported block type"}</p>;
-    }
-};
+// const ContentBlock = ({ block }) => {
+//     if (!block || !block.type) return null;
+//     switch (block.type) {
+//         case "heading":
+//             return <h3 className="text-xl font-bold mt-4 mb-2">{block.content}</h3>;
+//         case "paragraph":
+//             return <p className="mb-2 leading-relaxed">{block.content}</p>;
+//         case "ordered-list":
+//             return (
+//                 <ol className="list-decimal list-inside mb-3">
+//                     {block.items?.map((item, i) => (
+//                         <li key={i}>{item}</li>
+//                     ))}
+//                 </ol>
+//             );
+//         case "unordered-list":
+//             return (
+//                 <ul className="list-disc list-inside mb-3">
+//                     {block.items?.map((item, i) => (
+//                         <li key={i}>{item}</li>
+//                     ))}
+//                 </ul>
+//             );
+//         default:
+//             return <p>{block.content || "Unsupported block type"}</p>;
+//     }
+// };
 
 export default ArticleDocx;

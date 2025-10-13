@@ -178,7 +178,10 @@ details[open] .drop {
   scrollbar-color: rgb(172, 210, 172) rgb(255, 255, 255);
 }
 
-
+.scrollbar-color-2 {
+  scrollbar-color: var(--color-green-200) var(--color-gray-200);
+  /* scrollbar-width: 5px; */
+}
 
 .edit-form {
   backdrop-filter: blur(7px) saturate(184%);
@@ -453,4 +456,60 @@ details[open] .drop {
 
 .popup-out {
   animation: popupOut 0.2s ease-in forwards;
+}
+
+
+/*  */
+.ce-block {
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+}
+
+.ce-toolbar__actions {
+  z-index: 50;
+}
+
+.codex-editor__redactor {
+  padding-bottom: 0 !important;
+}
+
+.ce-block__content {
+  /* display: flex;
+  align-items: center; */
+  width: 100%;
+}
+
+/* .ce-toolbar__content {
+  margin: 0;
+} */
+
+/* .ce-block__content {
+  margin: 0;
+} */
+
+/* .ce-toolbar__actions {
+  position: static;
+} */
+
+.ce-block__content h1,
+.ce-header {
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+}
+
+.ce-block__content .ce-header {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+}
+
+.ce-block__content .ce-header {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+}
+
+.ce-block__content .ce-header {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
 }
