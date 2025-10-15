@@ -1,5 +1,52 @@
 [
     {
+        "category": "Database",
+        "visibility": "all",
+        "folder": [
+            {
+                "folderName": "Base",
+                "visibility": "agents",
+                "article": [
+                    {
+                        "title": "Article 001",
+                        "context": [
+                            {
+                                "type": "",
+                                "tag": [],
+                                "content": {
+                                    "time": 1760504117317,
+                                    "blocks": [
+                                        {
+                                            "id": "2PyHTrW5Bb",
+                                            "type": "image",
+                                            "data": {
+                                                "caption": "",
+                                                "withBorder": false,
+                                                "withBackground": false,
+                                                "stretched": false,
+                                                "file": {
+                                                    "url": "/uploads/1760504114953-anime-8052153_1280.jpg"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "version": "2.31.0"
+                                }
+                            }
+                        ],
+                        "artDel": false,
+                        "artType": "publish",
+                        "createDate": "15/10/2025",
+                        "modifiedDate": "15/10/2025"
+                    }
+                ],
+                "fldType": ""
+            }
+        ],
+        "generalArticle": [],
+        "type": ""
+    },
+    {
         "category": "General",
         "visibility": "all",
         "folder": [
@@ -16,7 +63,40 @@
                                 "tag": [
                                     "data"
                                 ],
-                                "content": "Starting to add article"
+                                "content": {
+                                    "time": 1760503997692,
+                                    "blocks": [
+                                        {
+                                            "id": "w5Am3M-WDK",
+                                            "type": "paragraph",
+                                            "data": {
+                                                "text": "Array"
+                                            }
+                                        },
+                                        {
+                                            "id": "KJN_ebgtpZ",
+                                            "type": "header",
+                                            "data": {
+                                                "text": "Heading",
+                                                "level": 2
+                                            }
+                                        },
+                                        {
+                                            "id": "Yr_lhtmkDc",
+                                            "type": "image",
+                                            "data": {
+                                                "caption": "",
+                                                "withBorder": false,
+                                                "withBackground": false,
+                                                "stretched": false,
+                                                "file": {
+                                                    "url": "/uploads/1760503992737-Screenshot 2025-10-08 161931.png"
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "version": "2.31.0"
+                                }
                             }
                         ],
                         "artDel": false,
@@ -31,33 +111,72 @@
         ],
         "generalArticle": [
             {
-                "artTitle": "Title",
+                "artTitle": "Title 001",
                 "artContext": [
                     {
                         "type": "paragraph",
                         "tag": [
-                            [
-                                "Array",
-                                "data"
-                            ],
+                            "Array",
                             "data",
-                            "Array"
+                            "json"
                         ],
-                        "content": "Starting to add article"
-                    }
-                ],
-                "artDel": false,
-                "artType": "publish"
-            },
-            {
-                "artTitle": "Title 2",
-                "artContext": [
-                    {
-                        "type": "paragraph",
-                        "tag": [
-                            "Data"
-                        ],
-                        "content": "Starting to add article"
+                        "content": {
+                            "time": 1760504017413,
+                            "blocks": [
+                                {
+                                    "id": "4a7wpHQhjF",
+                                    "type": "list",
+                                    "data": {
+                                        "style": "unordered",
+                                        "meta": {},
+                                        "items": [
+                                            {
+                                                "content": "Data",
+                                                "meta": {},
+                                                "items": []
+                                            },
+                                            {
+                                                "content": "Array",
+                                                "meta": {},
+                                                "items": []
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "id": "ASeITsOpRb",
+                                    "type": "table",
+                                    "data": {
+                                        "withHeadings": false,
+                                        "stretched": false,
+                                        "content": [
+                                            [
+                                                "Margrita",
+                                                "data"
+                                            ],
+                                            [
+                                                "margin",
+                                                "Data"
+                                            ]
+                                        ]
+                                    }
+                                },
+                                {
+                                    "id": "SFRUzeoZjT",
+                                    "type": "image",
+                                    "data": {
+                                        "caption": "Joker",
+                                        "withBorder": false,
+                                        "withBackground": false,
+                                        "stretched": false,
+                                        "file": {
+                                            "url": "/uploads/1760504009028-anime-8052153_1280.jpg"
+                                        }
+                                    }
+                                }
+                            ],
+                            "version": "2.31.0"
+                        }
                     }
                 ],
                 "artDel": false,
@@ -79,12 +198,38 @@
                         "context": [
                             {
                                 "type": "",
-                                "tag": [],
-                                "content": "Starting to add article"
+                                "tag": [
+                                    "Array"
+                                ],
+                                "content": [
+                                    {
+                                        "time": 1760437999710,
+                                        "blocks": [
+                                            {
+                                                "id": "3Is7PoPptQ",
+                                                "type": "paragraph",
+                                                "data": {
+                                                    "text": "Data"
+                                                }
+                                            }
+                                        ],
+                                        "version": "2.31.0"
+                                    },
+                                    {
+                                        "time": 1760438019900,
+                                        "blocks": [],
+                                        "version": "2.31.0"
+                                    },
+                                    {
+                                        "time": 1760438111079,
+                                        "blocks": [],
+                                        "version": "2.31.0"
+                                    }
+                                ]
                             }
                         ],
                         "artDel": false,
-                        "artType": "",
+                        "artType": "publish",
                         "createDate": "08/10/2025",
                         "modifiedDate": "08/10/2025"
                     },

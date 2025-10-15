@@ -1,10 +1,8 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
-// import EditableArticle from "./editableArticle";
+import { useState, useEffect, forwardRef, useRef, useImperativeHandle } from "react";
 import EditableArticle from "./editibleArticle2";
-import SlateEditor from "./editibleArticle2";
 
-const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEditArticleName, handleEditGeneralArtilceName }) => {
+const ArticleDocx = forwardRef(({ categoryData, setCategoryData, selectedArticle, handleEditArticleName, handleEditGeneralArtilceName, updateContentInJSON }, ref) => {
     const [openTagInput, setOpenTagInput] = useState(false);
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState([]);
@@ -14,6 +12,25 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
     const titleInputRef = useRef(null);
     const tagInputRef = useRef(null);
     const dropdownRef = useRef(null);
+    const editorRef = useRef(null);
+
+    useImperativeHandle(ref, () => ({
+        async save() {
+            console.log("Redddd")
+            if (editorRef.current) {
+                try {
+                    const editorData = await editorRef.current.save();  // Get data from EditableArticle
+                    console.log(editorData, "EDITOR")
+                    if (editorData) {
+                        updateContentInJSON(editorData);  // Pass data to GrandParent's save function
+                        console.log(editorData, "EDITOR")
+                    }
+                } catch (e) {
+                    console.error('Error saving data:', e);
+                }
+            }
+        },
+    }));
 
     useEffect(() => {
         if (isEditingTitle && titleInputRef.current) {
@@ -293,6 +310,7 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
                         ) : (
                             <h2
                                 className="text-3xl font-semibold mb-2 text-gray-900 cursor-text"
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onClick={() => {
                                     setIsEditingTitle(true);
                                     setEditTitleValue(articleTitle);
@@ -309,7 +327,14 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
                     {articleContent.length > 0
                         ? articleContent.map((block, index) => (
                             // <ContentBlock key={index} block={block} />
-                            <EditableArticle key={index} content={block} />
+                            <EditableArticle
+                                key={index}
+                                ref={editorRef}
+                                content={block}
+                                setCategoryData={setCategoryData}
+                                selectedArticle={selectedArticle}
+                                updateContentInJSON={updateContentInJSON}
+                            />
                             // <SlateEditor key={index} />
                         ))
                         : <p>Start writing your article here by typing /</p>}
@@ -317,34 +342,8 @@ const ArticleDocx = ({ categoryData, setCategoryData, selectedArticle, handleEdi
             </div>
         </div >
     );
-};
+});
 
-// const ContentBlock = ({ block }) => {
-//     if (!block || !block.type) return null;
-//     switch (block.type) {
-//         case "heading":
-//             return <h3 className="text-xl font-bold mt-4 mb-2">{block.content}</h3>;
-//         case "paragraph":
-//             return <p className="mb-2 leading-relaxed">{block.content}</p>;
-//         case "ordered-list":
-//             return (
-//                 <ol className="list-decimal list-inside mb-3">
-//                     {block.items?.map((item, i) => (
-//                         <li key={i}>{item}</li>
-//                     ))}
-//                 </ol>
-//             );
-//         case "unordered-list":
-//             return (
-//                 <ul className="list-disc list-inside mb-3">
-//                     {block.items?.map((item, i) => (
-//                         <li key={i}>{item}</li>
-//                     ))}
-//                 </ul>
-//             );
-//         default:
-//             return <p>{block.content || "Unsupported block type"}</p>;
-//     }
-// };
+
 
 export default ArticleDocx;

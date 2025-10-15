@@ -1,5 +1,5 @@
 'use client'
-import { useState } from "react";
+import { useState, useRef } from "react";
 import CategoryList from "../compenents/Knowledge/categoryPosition";
 import ArticleList from "../compenents/Knowledge/articlePosition";
 import FolderList from "../compenents/Knowledge/folderPosition";
@@ -90,6 +90,8 @@ const orderArticles = [
 
 const Knowledge = ({ dataCategory }) => {
     const [categoryData, setCategoryData] = useState(dataCategory);
+    const articleDoxRef = useRef(null);
+
     // Save data to backend JSON file
     const saveDataToServer = async (data) => {
         try {
@@ -592,8 +594,41 @@ const Knowledge = ({ dataCategory }) => {
         }, 400);
     };
 
-    const handleSaveType = (newType) => {
+    const updateContentInJSON = (tagsToSave) => {
         const { categoryIndex, folderIndex, articleIndex, generalArticleIndex } = selectedArticle;
+        setCategoryData((prevData) => {
+            const newData = JSON.parse(JSON.stringify(prevData));
+
+            let contentBlocks = [];
+
+            if (folderIndex != null && articleIndex != null) {
+                contentBlocks = newData[categoryIndex].folder[folderIndex].article[articleIndex].context;
+            } else if (generalArticleIndex != null) {
+                contentBlocks = newData[categoryIndex].generalArticle[generalArticleIndex].artContext;
+            }
+
+            contentBlocks.forEach(block => {
+                if (!Array.isArray(block.content)) block.content = [];
+                block.content = (tagsToSave);
+                // console.log(tagsToSave, "Content to save")
+            });
+            // console.log(contentBlocks, "COntentBlocks")
+
+            return newData;
+        });
+    };
+
+    const handleSaveType = async (newType) => {
+        console.log("Red entered")
+        const { categoryIndex, folderIndex, articleIndex, generalArticleIndex } = selectedArticle;
+        if (articleDoxRef.current) {
+            console.log("blue entered")
+            const editorData = await articleDoxRef.current.save();  // Get editor data from ArticleDox
+            if (editorData) {
+                updateContentInJSON(editorData);  // Update categoryData with editor data
+            }
+            console.log(editorData, 'EditorData');
+        }
 
         setCategoryData((prev) => {
             const updated = prev.map((cat, cIdx) => {
@@ -1293,11 +1328,13 @@ const Knowledge = ({ dataCategory }) => {
 
                 {/* Right Area */}
                 <ArticleDocx
+                    ref={articleDoxRef}
                     categoryData={categoryData}
                     setCategoryData={setCategoryData}
                     selectedArticle={selectedArticle}
                     handleEditArticleName={handleEditArticleName}
                     handleEditGeneralArtilceName={handleEditGeneralArtilceName}
+                    updateContentInJSON={updateContentInJSON}
                 />
             </div>
 

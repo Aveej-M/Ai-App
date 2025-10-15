@@ -2,9 +2,9 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { topicTable } from "../data/actionTable";
+import { topicTable } from "../../data/actionTable";
 
-const ClientTopics = ({ topicData: initialData, showForm, setShowForm }) => {
+const ClientTopics = ({ topicData: initialData, showForm, setShowForm, setTopicId, setShowTopics }) => {
     const [menuIndex, setMenuIndex] = useState(null);
     const [topicData, setTopicData] = useState(initialData);
     const [sortOrder, setSortOrder] = useState('asc');
@@ -33,6 +33,9 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm }) => {
         dateWrapper: [dateWrapper, setDateWrapper],
         creatorWrapper: [creatorWrapper, setCreatorWrapper],
     };
+    // console.log(textWrapper, "text wrapper")
+    // console.log(nameWrapper, "name wrapper")
+    console.log(wrapperStates, "Wrapper States")
 
 
     const menuRefs = useRef([]);
@@ -71,7 +74,7 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm }) => {
                 setTimeout(() => {
                     setWrapper(0);
 
-                }, 200)
+                }, 300)
             }
         }
 
@@ -286,7 +289,7 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm }) => {
                     <i className="fa-solid fa-arrow-rotate-right text-gray-500 group-hover:text-green-500 group-focus:text-green-500 outline-0 "></i>
                 </div>
             </div>
-            <div className={`w-full min-h-[500] `}>
+            <div className={`w-full min-h-[500]`}>
 
                 <p className="px-5">
                     {filteredData.length} items •
@@ -397,22 +400,21 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm }) => {
 
                             <tbody>
                                 {filteredData.map(({ name, description, id, savedAt, createdBy }, index) => (
-                                    <tr key={id} className="hover:bg-gray-200 hover:border-y-2 hover:border-y-gray-400">
-                                        <td className={`max-w-[200] ${nameWrapper && ('truncate whitespace-nowrap overflow-hidden')}`}>
-                                            <Link href={`/ai/topics/topic-details/${id}`}>
-                                                <span className="hover:border-b-1 border-green-500 text-green-500 hover:text-green-600">{name}</span>
-                                            </Link>
-
+                                    <tr key={id} className="border h-8.5 border-gray-300 hover:bg-gray-200 hover:border-y-2 hover:border-y-gray-400">
+                                        <td className={`max-w-[200] pl-2 ${nameWrapper && ('truncate whitespace-nowrap overflow-hidden')}`}>
+                                            <span
+                                                onClick={() => { setTopicId(id); setShowTopics(false) }}
+                                                className="hover:border-b-1 border-green-500 text-green-500 hover:text-green-600 cursor-pointer">{name}</span>
                                         </td>
                                         {showForm && (
                                             <>
-                                                <td className={`max-w-[200px] ${textWrapper && ('truncate whitespace-nowrap overflow-hidden')}`} title={description}>
+                                                <td className={`max-w-[200px] pl-2 ${textWrapper && ('truncate whitespace-nowrap overflow-hidden')}`} title={description}>
                                                     {description}
                                                 </td>
-                                                <td className="max-w-[150px] truncate whitespace-nowrap overflow-hidden">
+                                                <td className="max-w-[150px] pl-2 truncate whitespace-nowrap overflow-hidden">
                                                     {savedAt}
                                                 </td>
-                                                <td className="max-w-[200px] truncate whitespace-nowrap overflow-hidden">
+                                                <td className="max-w-[200px] pl-2 truncate whitespace-nowrap overflow-hidden">
                                                     {createdBy}
                                                 </td>
 
@@ -429,10 +431,8 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm }) => {
                                                         ref={(el) => (menuRefs.current[index] = el)}
                                                         className='absolute w-max right-5 border-2 border-gray-400 rounded p-[3px] text-gray-500 flex flex-col bg-white cursor-pointer gap-1 shadow-19'
                                                     >
-                                                        <Link href={`/ai/topics/topic-details/${id}`}>
-                                                            <p className='w-full px-[20] py-[5] rounded-[3] border-2 border-gray-100 shadow-green-100 hover:border-2 hover:border-green-500  hover:bg-green-100'>Edit</p>
-                                                        </Link>
-
+                                                        <p onClick={() => { setTopicId(id); setShowTopics(false) }}
+                                                            className='w-full px-[20] py-[5] rounded-[3] border-2 border-gray-100 shadow-green-100 hover:border-2 hover:border-green-500  hover:bg-green-100'>Edit</p>
                                                         <p
                                                             className='w-full px-[20] py-[5] rounded-[3] border-2 border-gray-100 shadow-green-100 hover:border-2 hover:border-green-500 hover:bg-green-100'
                                                             onClick={() => handleDelete(index, name)}
@@ -445,8 +445,6 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm }) => {
                                     </tr>
                                 ))}
                             </tbody>
-
-
                         </table>
                     </div>
                 )}

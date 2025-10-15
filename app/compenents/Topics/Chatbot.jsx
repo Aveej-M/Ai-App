@@ -176,7 +176,7 @@ const TopicsChatbot = ({ showForm, setShowForm }) => {
     <>
       <TopicsBotreply objects={objects} contacts={contacts} showForm={showForm} messages={messages} />
 
-      <div className="h-full min-w-[400px] w-[400px] max-lg:w-[300px] flex flex-col bg-gray-100 shadow-5 text-black">
+      <div className="h-full min-w-[300px] w-[400px] flex flex-col bg-gray-100 shadow-5 text-black">
         {/* Header */}
         <div className="w-full h-[60px] rounded px-5 flex items-center justify-between bg-gray-50 border-b border-gray-300 shadow">
           <h1 className="text-[20px] font-bold text-black">Conversation Preview</h1>
@@ -196,8 +196,8 @@ const TopicsChatbot = ({ showForm, setShowForm }) => {
             <div key={i} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
               <div
                 className={`px-4 py-2 mb-4 rounded-2xl max-w-[70%] ${msg.sender === "user"
-                    ? "bg-green-500 text-white rounded-br-none"
-                    : "bg-gray-200 text-black rounded-bl-none"
+                  ? "bg-green-500 text-white rounded-br-none"
+                  : "bg-gray-200 text-black rounded-bl-none"
                   }`}
               >
                 {msg.text}
