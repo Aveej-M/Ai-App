@@ -1,8 +1,9 @@
 'use client'
 import { useState } from "react";
 import { actionTable } from "../data/actionTable"
+import TopicsLayoutHeader from "./Topics/TopicsLayoutHeader";
 
-const ActionHead = () => {
+const ActionHead = ({ step, setStep }) => {
 
   const [searchInput, setSearchInput] = useState('');
   const [wrapper, setWrapper] = useState(0);
@@ -28,8 +29,9 @@ const ActionHead = () => {
 
   return (
     <>
-      <div className="text-black py-5">
-        <div className="w-full h-fit flex justify-between max-lg:gap-5 px-5">
+      <div className="text-black">
+        <TopicsLayoutHeader step={step} setStep={setStep} />
+        <div className="w-full h-fit flex justify-between max-lg:gap-5 px-5 pt-5">
           <p className="w-[50%]">Manage the actions assigned to your topic. To add or remove actions, your agent must be deactivated.</p>
           <button
             className="bg-green-500 hover:bg-green-600 align-middle rounded text-white w-30 h-[40] max-sm:mr-0"

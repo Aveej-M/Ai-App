@@ -1332,6 +1332,7 @@ const Knowledge = ({ dataCategory }) => {
                     categoryData={categoryData}
                     setCategoryData={setCategoryData}
                     selectedArticle={selectedArticle}
+                    setSelectedArticle={setSelectedArticle}
                     handleEditArticleName={handleEditArticleName}
                     handleEditGeneralArtilceName={handleEditGeneralArtilceName}
                     updateContentInJSON={updateContentInJSON}

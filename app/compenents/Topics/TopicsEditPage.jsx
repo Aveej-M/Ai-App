@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ActionHead from "../ActionHead";
-import TopicsLayoutHeader from "../TopicsLayoutHeader";
+import TopicsLayoutHeader from "./TopicsLayoutHeader";
 
 
 const TopicsEditPage = ({ topic, showForm, setShowForm, setShowTopics }) => {
@@ -162,10 +162,12 @@ const TopicsEditPage = ({ topic, showForm, setShowForm, setShowTopics }) => {
 
   return (
     <>
-      <div className="px-5 py-3 shadow justify-items sticky top-0 bg-white z-10">
-        <i onClick={() => setShowTopics(true)}
-          className="fa-solid fa-arrow-left cursor-pointer hover:text-green-400 transition"></i>
-        <h1>Topics Details</h1>
+      <div className="px-5 py-3 justify-items sticky top-0 bg-white z-10 border-b border-gray-300">
+        <div className="flex-items">
+          <i onClick={() => setShowTopics(true)}
+            className="fa-solid fa-arrow-left cursor-pointer hover:text-green-400 transition"></i>
+          <h1>Topics Details</h1>
+        </div>
         <div className="cursor-pointer"
           onClick={() => setShowForm(!showForm)}
         >
@@ -341,7 +343,7 @@ const TopicsEditPage = ({ topic, showForm, setShowForm, setShowTopics }) => {
               <div className="w-full flex items-center justify-end gap-5 px-5">
                 <button
                   type="button"
-                  onClick={() => router.push("/ai/topics")}
+                  onClick={() => setShowTopics(true)}
                   className="w-[100px] px-4 py-2 text-green-400 border border-gray-400 rounded hover:bg-gray-100 hover:text-green-500 transition">
                   Cancel
                 </button>
@@ -359,7 +361,7 @@ const TopicsEditPage = ({ topic, showForm, setShowForm, setShowTopics }) => {
       )}
 
       {step === 2 && (
-        <ActionHead />
+        <ActionHead step={step} setStep={setStep} />
       )}
 
       {notification.visibility && (

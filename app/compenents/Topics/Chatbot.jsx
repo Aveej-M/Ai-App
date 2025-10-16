@@ -178,7 +178,7 @@ const TopicsChatbot = ({ showForm, setShowForm }) => {
 
       <div className="h-full min-w-[300px] w-[400px] flex flex-col bg-gray-100 shadow-5 text-black">
         {/* Header */}
-        <div className="w-full h-[60px] rounded px-5 flex items-center justify-between bg-gray-50 border-b border-gray-300 shadow">
+        <div className="w-full h-[49px] px-5 flex items-center justify-between bg-gray-50 border-b border-gray-300 shadow">
           <h1 className="text-[20px] font-bold text-black">Conversation Preview</h1>
           <Image src="/reboot.png" alt="reboot icon" width={20} height={20} />
         </div>
@@ -215,7 +215,7 @@ const TopicsChatbot = ({ showForm, setShowForm }) => {
             rows={4}
             onChange={(e) => setInput(e.target.value)}
           />
-          <button type="submit" className="absolute right-3 bottom-6">
+          <button type="submit" className="absolute right-6 bottom-6">
             <i className="fa-solid fa-paper-plane text-green-500 rotate-45"></i>
           </button>
         </form>

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { topicTable } from "../../data/actionTable";
 
@@ -39,6 +39,7 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm, setTopicI
 
 
     const menuRefs = useRef([]);
+    const router = useRouter();
 
     // Handle click outside
     useEffect(() => {
@@ -128,7 +129,10 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm, setTopicI
             });
 
             if (res.ok) {
-                setTopicData(prev => prev.filter((_, index) => index !== indexToDelete));
+                // ✅ Use unique key (name or id) instead of index
+                setTopicData(prev => prev.filter(item => item.name !== name));
+                setFilteredData(prev => prev.filter(item => item.name !== name));
+
                 setNotification({
                     message: 'Deleted successfully!',
                     visibility: true,
@@ -146,6 +150,8 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm, setTopicI
             setTimeout(() => {
                 setNotification({ message: '', visibility: false, type: '' });
             }, 3000);
+
+            router.refresh();
         } catch (err) {
             console.error('Error deleting:', err);
             setNotification({
@@ -157,7 +163,9 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm, setTopicI
                 setNotification({ message: '', visibility: false, type: '' });
             }, 3000);
         }
+        setMenuIndex(null);
     };
+
 
     // const handleSort = (key) => {
     // // Map display label to actual object key
@@ -264,14 +272,6 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm, setTopicI
 
     return (
         <div>
-            {/* <div className="absolute -top-10 right-5 cursor-pointer"
-                onClick={() => setShowForm(!showForm)}
-            >
-                {showForm === true ?
-                 <i className="fa-regular fa-square-caret-left text-[20px] hover:text-green-500"></i> :
-                 <i className="fa-regular fa-square-caret-right text-[20px] hover:text-green-500"></i>}
-                
-            </div> */}
             <div className={`relative flex gap-2 my-4 max-sm:mr-0 px-5 ${!showForm && 'max-w-[400px]'}`}>
                 <i className="fa-solid fa-magnifying-glass text-gray-500 absolute top-4.5 left-7"></i>
                 <input type="text" placeholder='Search topics...'
@@ -435,7 +435,7 @@ const ClientTopics = ({ topicData: initialData, showForm, setShowForm, setTopicI
                                                             className='w-full px-[20] py-[5] rounded-[3] border-2 border-gray-100 shadow-green-100 hover:border-2 hover:border-green-500  hover:bg-green-100'>Edit</p>
                                                         <p
                                                             className='w-full px-[20] py-[5] rounded-[3] border-2 border-gray-100 shadow-green-100 hover:border-2 hover:border-green-500 hover:bg-green-100'
-                                                            onClick={() => handleDelete(index, name)}
+                                                            onClick={() => handleDelete(null, name)}
                                                         >Remove from Agent</p>
                                                     </div>
                                                 )}

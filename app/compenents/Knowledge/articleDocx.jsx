@@ -2,7 +2,7 @@
 import { useState, useEffect, forwardRef, useRef, useImperativeHandle } from "react";
 import EditableArticle from "./editibleArticle2";
 
-const ArticleDocx = forwardRef(({ categoryData, setCategoryData, selectedArticle, handleEditArticleName, handleEditGeneralArtilceName, updateContentInJSON }, ref) => {
+const ArticleDocx = forwardRef(({ categoryData, setCategoryData, selectedArticle, setSelectedArticle, handleEditArticleName, handleEditGeneralArtilceName, updateContentInJSON }, ref) => {
     const [openTagInput, setOpenTagInput] = useState(false);
     const [tagInput, setTagInput] = useState('');
     const [tags, setTags] = useState([]);
@@ -153,6 +153,44 @@ const ArticleDocx = forwardRef(({ categoryData, setCategoryData, selectedArticle
         articleTitle = generalArticle?.artTitle || "Untitled Article";
         articleContent = Array.isArray(generalArticle?.artContext) ? generalArticle.artContext : [];
     }
+
+    const handleNavigate = (direction) => {
+        const { categoryIndex, folderIndex, articleIndex, generalArticleIndex } = selectedArticle;
+
+        // 🧭 Folder-based articles
+        if (folderIndex != null && articleIndex != null) {
+            const articles = categoryData?.[categoryIndex]?.folder?.[folderIndex]?.article || [];
+            const newIndex = direction === 'next' ? articleIndex + 1 : articleIndex - 1;
+
+            if (newIndex >= 0 && newIndex < articles.length) {
+                // ✅ Update parent-selected article
+                setSelectedArticle({
+                    categoryIndex,
+                    folderIndex,
+                    articleIndex: newIndex,
+                    generalArticleIndex: null,
+                });
+            }
+        }
+
+        // 🧭 General articles
+        else if (generalArticleIndex != null) {
+            const generalArticles = categoryData?.[categoryIndex]?.generalArticle || [];
+            const newIndex = direction === 'next' ? generalArticleIndex + 1 : generalArticleIndex - 1;
+
+            if (newIndex >= 0 && newIndex < generalArticles.length) {
+                setSelectedArticle({
+                    categoryIndex,
+                    folderIndex: null,
+                    articleIndex: null,
+                    generalArticleIndex: newIndex,
+                });
+            }
+        }
+    };
+
+
+
 
 
     return (
@@ -321,9 +359,10 @@ const ArticleDocx = forwardRef(({ categoryData, setCategoryData, selectedArticle
                             </h2>
                         )}
                     </div>
+
                 </div>
 
-                <div className="prose max-w-none mt-10 ml-3">
+                <div className="prose max-w-none mt-10 ml-3 pb-15">
                     {articleContent.length > 0
                         ? articleContent.map((block, index) => (
                             // <ContentBlock key={index} block={block} />
@@ -339,6 +378,67 @@ const ArticleDocx = forwardRef(({ categoryData, setCategoryData, selectedArticle
                         ))
                         : <p>Start writing your article here by typing /</p>}
                 </div>
+
+                {/* <div className="px-15">
+                    <div className="flex justify-between items-center shadow-11 hover:shadow-2xl cursor-pointer px-5 py-5 rounded">
+                        <div>
+                            <p className="text-sm">Next</p>
+                            <h3 className="text-[18px] font-bold">{articleTitle}</h3>
+                        </div>
+                        <i className="fa-solid fa-arrow-right text-[20px]"></i>
+                    </div>
+                </div> */}
+                <div className="px-15 flex justify-between gap-5 mt-10">
+                    {/* PREVIOUS BUTTON */}
+                    <div
+                        onClick={() => handleNavigate('prev')}
+                        className={`flex-1 flex justify-between items-center border border-gray-200 hover:shadow-lg cursor-pointer px-5 py-5 rounded transition-all duration-200 ${((folderIndex != null && articleIndex === 0) || (generalArticleIndex === 0)) ? 'hidden' : ''}`}
+                    >
+                        <i className="fa-solid fa-arrow-left text-[20px]"></i>
+                        <div>
+                            <p className="text-sm">Previous</p>
+                            <h3 className="text-[18px] font-bold">
+                                {(() => {
+                                    if (folderIndex != null && articleIndex > 0) {
+                                        return categoryData?.[categoryIndex]?.folder?.[folderIndex]?.article?.[articleIndex - 1]?.title || '—';
+                                    } else if (generalArticleIndex > 0) {
+                                        return categoryData?.[categoryIndex]?.generalArticle?.[generalArticleIndex - 1]?.artTitle || '—';
+                                    }
+                                    return '—';
+                                })()}
+                            </h3>
+                        </div>
+                    </div>
+
+                    {/* NEXT BUTTON */}
+                    <div
+                        onClick={() => handleNavigate('next')}
+                        className={`flex-1 flex justify-between items-center border border-gray-200 hover:shadow-lg cursor-pointer px-5 py-5 rounded transition-all duration-200
+      ${(() => {
+                                const nextFolderArticles = categoryData?.[categoryIndex]?.folder?.[folderIndex]?.article?.length || 0;
+                                const nextGeneralArticles = categoryData?.[categoryIndex]?.generalArticle?.length || 0;
+                                if ((folderIndex != null && articleIndex === nextFolderArticles - 1) ||
+                                    (generalArticleIndex === nextGeneralArticles - 1)) return 'hidden';
+                                return '';
+                            })()}`}
+                    >
+                        <div>
+                            <p className="text-sm">Next</p>
+                            <h3 className="text-[18px] font-bold">
+                                {(() => {
+                                    if (folderIndex != null) {
+                                        return categoryData?.[categoryIndex]?.folder?.[folderIndex]?.article?.[articleIndex + 1]?.title || '—';
+                                    } else if (generalArticleIndex != null) {
+                                        return categoryData?.[categoryIndex]?.generalArticle?.[generalArticleIndex + 1]?.artTitle || '—';
+                                    }
+                                    return '—';
+                                })()}
+                            </h3>
+                        </div>
+                        <i className="fa-solid fa-arrow-right text-[20px]"></i>
+                    </div>
+                </div>
+
             </div>
         </div >
     );

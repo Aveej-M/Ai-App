@@ -1,5 +1,5 @@
 'use client';
-import TopicsHead from '../compenents/TopicsHead';
+import TopicsHead from './Topics/TopicsHead';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';

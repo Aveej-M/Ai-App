@@ -209,7 +209,7 @@ function TopicsPage({ topicData }) {
         <div className={`${!showForm ? 'w-[400px]' : 'w-full'} min-w-[300px] h-full text-black shadow-right ${showTopics ? "overflow-auto" : "overflow-hidden"}`}>
           {showTopics && (
             <div>
-              <div className="px-5 py-3 shadow justify-items sticky top-0 bg-white z-10">
+              <div className="px-5 py-3 border-b border-gray-300 justify-items sticky top-0 bg-white z-10">
                 <h1>Topics</h1>
                 <div className="cursor-pointer"
                   onClick={() => setShowForm(!showForm)}
@@ -242,7 +242,7 @@ function TopicsPage({ topicData }) {
 
               {showModal && (
                 <div className="fixed z-20 top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center">
-                  <div className="bg-white pt-1 rounded-lg w-[600px] max-h-[90vh] relative">
+                  <div className="bg-white pt-1 rounded-lg w-[600px] max-h-[80vh] relative">
                     {/* Close Button */}
                     <button
                       onClick={handleClose}

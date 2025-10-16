@@ -8,7 +8,7 @@ const TopicsLayoutHeader = ({ step, setStep }) => {
   return (
     <>
       <div className="text-black z-10">
-        <div className="h-[60px] shadow px-10 flex items-center gap-5 bg-white z-1">
+        <div className="h-[45px] shadow px-10 flex items-center gap-5 bg-white z-1">
           <button
             onClick={() => setStep(1)}
             className={`flex items-center ${step === 1

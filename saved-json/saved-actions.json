@@ -1,17 +1,5 @@
 [
   {
-    "id": "c65f7443-a980-4451-9e08-fe511fbbfee6",
-    "name": "Financial Data Analysis data",
-    "description": "To add a unique id to each new entry in your current code, you can use the built-in crypto.randomUUID() method from Node.js (available in Node 16.7+ and later).",
-    "instructions": [
-      "Your job is to only review company actions and ensure compliance with legal standards. You aren't able to provide legal advice.",
-      "Image with src \"/Header/drop.png\" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: \"auto\"' or 'height: \"auto\"' to maintain the aspect ratio."
-    ],
-    "createdBy": "",
-    "savedAt": "Oct 15, 25",
-    "scope": "To add a unique id to each new entry in your current code, you can use the built-in crypto.randomUUID() method from Node.js (available in Node 16.7+ and later)."
-  },
-  {
     "id": "9e5ed242-308e-463b-b1b6-2570161fb537",
     "name": "Budget Optimization",
     "description": "Use this topic to ensure company actions comply with legal standards.lsasjdlsadsid",
@@ -90,18 +78,18 @@
     "createdBy": ""
   },
   {
-    "id": "39f7e9e2-dcf2-4695-81c0-44e2cc8144df",
+    "id": "3ceafabb-6128-4f39-8c5c-d0e3888e3c0e",
     "topicDescription": "",
-    "name": "Budget Optimization 1",
-    "description": "i",
-    "scope": "w",
+    "name": "Spark Agent 001",
+    "description": "Use this topic to review budgets and propose cost-saving measures.\n",
+    "scope": "Use this topic to review budgets and propose cost-saving measures.",
     "instructions": [
-      "w"
+      "Use this topic to review budgets and propose cost-saving measures."
     ],
     "inputs": [
       ""
     ],
-    "savedAt": "Aug 21, 25",
+    "savedAt": "Oct 16, 25",
     "createdBy": ""
   }
 ]

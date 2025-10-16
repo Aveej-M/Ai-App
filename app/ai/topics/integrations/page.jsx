@@ -39,10 +39,10 @@ const Integrations = () => {
 
   return (
     <>
-      <div className="h-full w-full overflow-y-auto">
+      <div className="h-full w-full overflow-y-auto overflow-x-hidden">
         <div className="p-5 grid grid-cols-3 max-lg:grid-cols-2 gap-6">
           {integrations.map(({ name, logo, label, button }, index) => (
-            <div key={index} className="relative h-60 w-80 border border-gray-200 shadow rounded-[5px] p-5 text-black hover:shadow-xl transition duration-300">
+            <div key={index} className="relative h-60 max-w-full border border-gray-200 shadow rounded-[5px] p-5 text-black hover:shadow-xl transition duration-300">
               {!button && (
                 <div className="absolute -right-5 top-2 flex flex-col items-end">
                   <div className="h-6 w-35 bg-green-500 text-white rounded-t-[5px] rounded-l-[5px] flex items-center justify-center shadow-5">Coming Soon</div>

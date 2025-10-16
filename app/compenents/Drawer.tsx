@@ -14,7 +14,7 @@ export default function Sidebar() {
     <>
       {/* Sidebar */}
       <div
-        className={`${pathName === '/ai/topics' ? 'h-[41rem] top-10 mt-16.5' : 'h-screen'} max-h-[100dvh] sticky pt-[68px] ${isCollapsed ? 'w-20' : 'w-64'
+        className={`${pathName === '/ai/topics' ? 'h-[42rem] top-10 mt-16.5' : 'h-screen'} max-h-[100dvh] sticky pt-[68px] ${isCollapsed ? 'w-20' : 'w-64'
           } bg-gray-100 flex flex-col justify-between p-4 border-r border-gray-200 transition-all `}
       >
         <div className={`${pathName === '/ai/topics' ? 'relative -top-14' : 'pt-2.5'}`}>
@@ -47,7 +47,7 @@ export default function Sidebar() {
               {!isCollapsed && <span>Knowledge Base</span>}
             </Link>
             <Link
-              href="#"
+              href="/chat"
               className={`dashboard-active ${isCollapsed ? 'justify-center ' : 'justify-start'}`}
             >
               <Image

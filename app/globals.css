@@ -61,7 +61,7 @@
   }
 
   .topic-formInput {
-    @apply border border-gray-400 hover:border-green-400 focus:border-green-500 focus:outline-green-500 w-full rounded mt-2 px-4 text-[14px] scrollbar-width: none;
+    @apply border border-gray-400 hover:border-green-400 focus:border-green-500 focus:outline-green-500 w-full rounded mt-2 px-4 text-[14px];
   }
 
 }
@@ -115,6 +115,10 @@ button {
 
 summary {
   list-style: none;
+}
+
+textarea {
+  scrollbar-width: none !important;
 }
 
 .drop {
@@ -200,6 +204,10 @@ details[open] .drop {
 
 .shadow-1 {
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.shadow-2 {
+  box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
 }
 
 .shadow-5 {
