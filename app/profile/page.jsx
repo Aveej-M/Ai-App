@@ -27,6 +27,7 @@ const Profile = () => {
     const [timeZone, setTimeZone] = useState('');
     const [themeColor, setThemeColor] = useState(0);
     const positionTop = 'top-full';
+    const width= "w-90"
     console.log(themeColor, 'themecolor')
 
     const getThemeIndex = (index) => {
@@ -80,8 +81,12 @@ const Profile = () => {
                         </div>
 
                         <div className='flex flex-col'>
+                            <label htmlFor="phone-input" className="block text-sm font-medium text-slate-700 mb-1">
+                                Phone Number
+                            </label>
+
                             <PhoneinputSelector selectedCountry={selectedCountry} setSelectedCountry={setSelectedCountry}
-                                dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen}
+                                dropdownOpen={dropdownOpen} setDropdownOpen={setDropdownOpen} width={width}
                                 searchQuery={searchQuery} setSearchQuery={setSearchQuery} positionTop={positionTop}
                             // containerRef={containerRef}
                             />

@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import countries from "../data/countryCodeData";
 import Image from "next/image";
 
-export default function PhoneinputSelector({selectedCountry, setSelectedCountry,dropdownOpen, setDropdownOpen, searchQuery, setSearchQuery, positionTop}) {
+export default function PhoneinputSelector({selectedCountry, setSelectedCountry,dropdownOpen, width, setDropdownOpen, searchQuery, setSearchQuery, positionTop}) {
   // const [selectedCountry, setSelectedCountry] = useState(null); // start with no selection
   // const [dropdownOpen, setDropdownOpen] = useState(false);
   // const [searchQuery, setSearchQuery] = useState("");
@@ -30,11 +30,6 @@ export default function PhoneinputSelector({selectedCountry, setSelectedCountry,
 
 
   return (
-    <div>
-      <label htmlFor="phone-input" className="block text-sm font-medium text-slate-700 mb-1">
-        Phone Number
-      </label>
-
       <div className="flex gap-2 relative rounded w-full text-black" ref={containerRef}>
         {/* Country Selector / Searchable Button */}
         <div
@@ -77,7 +72,7 @@ export default function PhoneinputSelector({selectedCountry, setSelectedCountry,
 
           {/* Dropdown Panel */}
           {dropdownOpen && (
-            <ul className={`max-h-52 overflow-y-auto absolute ${positionTop} left-0 w-90 mt-1 bg-white border border-gray-300 rounded-md shadow-md z-10`}>
+            <ul className={`max-h-52 overflow-y-auto absolute ${positionTop} left-0 ${width} mt-1 bg-white border border-gray-300 rounded-md shadow-md z-10`}>
               {filteredCountries.map((country) => (
                 <li
                   key={country.code}
@@ -114,9 +109,9 @@ export default function PhoneinputSelector({selectedCountry, setSelectedCountry,
           type="tel"
           maxLength={10}
           placeholder="Enter phone number"
+          description="Please fill this field"
           className="form-input flex-grow px-3 bg-white text-gray-900 placeholder-gray-400 placeholder:font-medium"
         />
       </div>
-    </div>
   );
 }
