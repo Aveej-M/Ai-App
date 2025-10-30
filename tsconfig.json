@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/compenents/FileUpload.jsx", "app/ai/sources/website/page.jsx", "app/ai/sources/text/page.jsx", "app/ai/sources/q&a/page.jsx", "app/compenents/Calender.jsx", "app/ai/settings/chat/page.jsx", "app/ai/custom-action/page.jsx", "app/ai/topics/page.jsx", "app/ai/topics/topic-details/[id]/layout.tsx", "app/ai/playground/page.jsx", "app/ai/topics/integrations/page.jsx", "app/data/selectStyle.js", "app/profile/page.jsx", "app/layout.jsx", "app/compenents/Header.jsx"],
+  "exclude": ["node_modules"]
+}
+
+

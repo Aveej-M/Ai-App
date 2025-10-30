@@ -1,0 +1,95 @@
+[
+  {
+    "id": "9e5ed242-308e-463b-b1b6-2570161fb537",
+    "name": "Budget Optimization",
+    "description": "Use this topic to ensure company actions comply with legal standards.lsasjdlsadsid",
+    "instructions": [
+      "If the query is about identifying user permissions, use AdminCopilot__IdentifyUserPermissionsByName.",
+      "If the user asks for an overview of object permissions, use AdminCopilot__GetAndExplainObjectPermissions.",
+      "AdminCopilot__GetAndExplainObjectPermissions. f the query is about identifying user permissions,"
+    ],
+    "savedAt": "Aug 19, 25",
+    "scope": "Use this topic to ensure company actions comply with legal standards.lsasjdlsadsid",
+    "createdBy": ""
+  },
+  {
+    "id": "5fe0208c-c3fb-40da-a238-14641ea61581",
+    "topicDescription": "",
+    "name": "Financial Data Analysis",
+    "description": "Use this topic to ensure company actions comply with legal standards.",
+    "scope": "Use this topic to ensure company actions comply with legal standards.",
+    "instructions": [
+      "Use this topic to ensure company actions comply with legal standards."
+    ],
+    "savedAt": "Aug 19, 25",
+    "createdBy": ""
+  },
+  {
+    "id": "5093eafe-ce5d-4b49-b17b-2b7f68545a77",
+    "topicDescription": "",
+    "name": "Legal Compliance Review",
+    "description": "Use this topic to ensure company actions comply with legal standards",
+    "scope": "Your job is to only review company actions and ensure compliance with legal standards. You aren't able to provide legal advice.",
+    "instructions": [
+      "If the query is about identifying user permissions, use AdminCopilot__IdentifyUserPermissionsByName.",
+      "If the user asks for an overview of object permissions, use AdminCopilot__GetAndExplainObjectPermissions."
+    ],
+    "savedAt": "Aug 18, 25",
+    "createdBy": ""
+  },
+  {
+    "id": "253315e5-2345-443a-8e20-86174f88c358",
+    "topicDescription": "",
+    "name": "Risk Assessment",
+    "description": "Use this topic to evaluate potential risks and recommend mitigation strategies.",
+    "scope": "Use this topic to evaluate potential risks and recommend mitigation strategies.",
+    "instructions": [
+      "Use this topic to evaluate potential risks and recommend mitigation strategies."
+    ],
+    "savedAt": "Aug 18, 25",
+    "createdBy": ""
+  },
+  {
+    "id": "c4615d26-1d2e-4111-afa0-2da9233d0691",
+    "topicDescription": "",
+    "name": "Jeeva",
+    "description": "his block covers K to Z countries (Kenya → Zimbabwe) in the correct format for your component.",
+    "scope": "his block covers K to Z countries (Kenya → Zimbabwe) in the correct format for your component.",
+    "instructions": [
+      "his block covers K to Z countries (Kenya → Zimbabwe) in the correct format for your component.",
+      "his block covers K to Z countries (Kenya → Zimbabwe) in the correct format for your component."
+    ],
+    "savedAt": "Aug 18, 25",
+    "createdBy": ""
+  },
+  {
+    "id": "d3841eaf-b644-4dbf-87b3-3ee4a8c56063",
+    "topicDescription": "Agent",
+    "name": "Agent Spark",
+    "description": "Handles customer inquiries about changing their contact information and resetting their password.",
+    "scope": "Handles customer inquiries about changing their contact information and resetting their password.",
+    "instructions": [
+      "Handles customer inquiries about changing their contact information and resetting their password."
+    ],
+    "inputs": [
+      ""
+    ],
+    "savedAt": "Oct 15, 25",
+    "createdBy": ""
+  },
+  {
+    "id": "3ceafabb-6128-4f39-8c5c-d0e3888e3c0e",
+    "topicDescription": "",
+    "name": "Spark Agent 001",
+    "description": "Use this topic to review budgets and propose cost-saving measures.\n",
+    "scope": "Use this topic to review budgets and propose cost-saving measures.",
+    "instructions": [
+      "Use this topic to review budgets and propose cost-saving measures."
+    ],
+    "inputs": [
+      ""
+    ],
+    "savedAt": "Oct 16, 25",
+    "createdBy": ""
+  }
+]

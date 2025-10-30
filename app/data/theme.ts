@@ -1,0 +1,18 @@
+export const Theme = [
+    { color: '#ff1616', },
+    { color: '#ff5757', },
+    { color: '#ff66c4', },
+    { color: '#cb6ce6', },
+    { color: '#8c52ff', },
+    { color: '#5e17eb', },
+    { color: '#03989e', },
+    { color: '#00c2cb', },
+    { color: '#38b6ff', },
+    { color: '#5271ff', },
+    { color: '#004aad', },
+    { color: '#008037', },
+    { color: '#7ed957', },
+    { color: '#ffbd59', },
+    { color: '#a6a6a6', },
+    { color: '#000000', },
+]
