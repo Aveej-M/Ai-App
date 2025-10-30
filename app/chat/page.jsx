@@ -1,13 +1,14 @@
 "use client"
-import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import ConversationView from "../compenents/Chat/ConversationView";
-import MediaLibrary from "../compenents/Chat/MediaLibrary";
-import CannedResponse from "../compenents/Chat/CannedResponse";
+import { useState, useEffect, useRef } from "react";
 import FilterTab from "../compenents/Chat/FilterTab";
 import AddContacts from "../compenents/Chat/AddContacts";
+import MediaLibrary from "../compenents/Chat/MediaLibrary";
 import ChatReplyBox from "../compenents/Chat/ChatReplyBox";
 import { assignOptions, chatMessages } from "../data/chat";
+import SendTemplates from "../compenents/Chat/SendTemplates";
+import CannedResponse from "../compenents/Chat/CannedResponse";
+import ConversationView from "../compenents/Chat/ConversationView";
 
 const LiveChat = () => {
     const [bookMark, setBookMark] = useState(true);
@@ -33,6 +34,7 @@ const LiveChat = () => {
 
     const [openMediaLibrary, setOpenMediaLibrary] = useState(false);
     const [openCannedRes, setOpenCannedRes] = useState(false);
+    const [openTemplates, setOpenTemplates] = useState(false);
 
     useEffect(() => {
         const bookmarked = chatMessages.find((chat) => chat.bookMark === true);
@@ -95,7 +97,7 @@ const LiveChat = () => {
         setConversationMessages([]);
     };
 
-    const handelSelectCommversationMsg = (conversationId, idx) => {
+    const handelSelectConversationMsg = (conversationId, idx) => {
         setFiles([]);
         const found = chatMessages.find((c) => c.name === selectedConversation);
         const foundChat = found?.chats.find((chat) => chat.conversationId === conversationId);
@@ -161,6 +163,19 @@ const LiveChat = () => {
     };
 
     const handleUpdateStatus = () => {
+        const now = new Date();
+        const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+
+        const resolvedMsg = `Conversation status changed from On hold to Closed by Pradeep Chandran at ${time}`
+        if (!resolvedMsg) return;
+        const newMessage = {
+            sender : "System",
+            role: "system",
+            message: resolvedMsg,
+            timestamp: new Date().toISOString(),
+        };
+
+        setConversationMessages((prev) => [...prev, newMessage])
         setSelectedChat((prev) => ({
             ...prev, status: false
         }));
@@ -187,14 +202,17 @@ const LiveChat = () => {
                     />
                 </div>
             )}
-
             {openFilterTab && (
                 <FilterTab 
                 setOpenFilterTab={setOpenFilterTab}
                 />
             )}
+            {openTemplates && (
+                <SendTemplates setOpenTemplates={setOpenTemplates} />
+            )}
+
             {/* Left Area */}
-            <div className='w-[30%] h-full bg-gray-50 relative'>
+            <div className='w-[30%] h-screen -top-15 pt-15 pb-12 bg-gray-50 relative flex flex-col'>
                 <div>
                     <div className='p-5 flex items-center gap-3 shadow-11'>
                         <div className="relative group hover:bg-green-200 px-1 rounded-2xl">
@@ -256,14 +274,14 @@ const LiveChat = () => {
                             </div>
                         </div>
                     </div>
-                    <div className='flex gap-2 px-5 text-xs text-gray-500'>
+                    <div className='flex gap-2 px-5 pb-3 text-xs text-gray-500'>
                         <div className='px-4 py-1 bg-gray-200 hover:bg-gray-300 rounded-2xl cursor-pointer'>All</div>
                         <div className='px-4 py-1 bg-gray-200 hover:bg-gray-300 rounded-2xl cursor-pointer'>Unread</div>
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto flex-col justify-between">
-                    <div>
+                <div className="flex flex-1 h-full overflow-y-auto flex-col justify-between">
+                    {/* <div> */}
                         {chatMessages.map((conversationGroup, idx) => {
                         if (conversationGroup.name === selectedConversation) {
                             if (conversationGroup.chats.length > 0) {
@@ -272,8 +290,8 @@ const LiveChat = () => {
                                 {conversationGroup.chats.map((chat, msgIdx) => (
                                     <div
                                     key={chat.conversationId}
-                                    className={`border-b border-b-gray-400 hover:bg-gray-100 justify-items py-3 px-6 cursor-pointer`}
-                                    onClick={()=> handelSelectCommversationMsg(chat.conversationId, msgIdx)}
+                                    className={`border-b border-b-gray-400 hover:bg-gray-100 justify-items py-3 px-6 cursor-pointer ${selectedChat && selectedChat.conversationId === chat.conversationId ? 'bg-gray-200 hover:bg-gray-200' : ''}`}
+                                    onClick={()=> handelSelectConversationMsg(chat.conversationId, msgIdx)}
                                     >
                                         <div className="flex-items">
                                             <div className="flex-items text-white font-bold h-8 w-8 bg-green-600 rounded-full">
@@ -316,7 +334,7 @@ const LiveChat = () => {
                         }
                         return null;
                         })}
-                    </div>
+                    {/* </div> */}
 
                    {(() => {
                         const selectedGroup = chatMessages.find(
@@ -449,7 +467,7 @@ const LiveChat = () => {
                     )}
 
                     <div className="flex justify-between flex-col h-[90%]">
-                        <div className="bg-[url(/whats-bg.png)] bg-cover h-full overflow-y-auto pt-3">
+                        <div className={`${selectedConversation && conversationMessages.length > 0 ? "bg-[url(/whats-bg.png)] bg-cover" : "bg-gray-100"} h-full overflow-y-auto pt-3`}>
                             <div className=" flex flex-col w-full h-full">
                                 {selectedConversation && conversationMessages.length > 0 && (
                                 <div className="w-full flex-items mb-3">
@@ -481,24 +499,28 @@ const LiveChat = () => {
                                         } else if ((msg.sender === "agent") || (msg.role === "agent")) {
                                             return (
                                                 <div key={index} className="flex justify-end mb-3 group">
-                                                    <div className="relative group/arrow w-fit cursor-pointer h-8">
+                                                    <div className="flex items-center group/arrow w-fit cursor-pointer">
                                                         {/* Dropdown arrow (visible on hover of message group) */}
-                                                        <i className="fa-solid fa-sort-down text-gray-400 opacity-0 group-hover:opacity-100"></i>
+                                                        <div className="relative mb-1.5">
+                                                            <i className="fa-solid fa-sort-down text-gray-400 opacity-0 group-hover:opacity-100"></i>
 
-                                                        {/* Reply box (visible when hovering the arrow itself) */}
-                                                        <div className={`absolute z-20 right-0 mt-1 text-xs p-0.5 bg-white rounded hidden transition-all duration-200  ${replyTo === null ? "group-hover/arrow:block" : ""}`}>
-                                                            <div className="flex-items-2 pl-3 hover:bg-gray-100 rounded cursor-pointer">
-                                                                <i className="fa-solid fa-reply"></i>
-                                                                <p 
-                                                                    onClick={() => setReplyTo(msg.message)}
-                                                                    className="p-2">Reply</p>
+                                                            {/* Reply box (visible when hovering the arrow itself) */}
+                                                            <div className="absolute z-20 right-0 top-3 pt-3">
+                                                                <div className={`mt-1 text-xs p-0.5 bg-white rounded hidden transition-all duration-200 shadow ${replyTo === null ? "group-hover/arrow:block" : ""}`}>
+                                                                    <div className="flex-items-2 pl-3 hover:bg-gray-100 rounded cursor-pointer">
+                                                                        <i className="fa-solid fa-reply"></i>
+                                                                        <p 
+                                                                            onClick={() => setReplyTo(msg.message)}
+                                                                            className="p-2">Reply</p>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
 
                                                     {/* Message bubble */}
-                                                    <div className="max-w-[70%] flex gap-2 bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative">
-                                                        <p>{msg.message}</p>
+                                                    <div className="max-w-[70%] flex gap-2 bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative min-h-10">
+                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }}></p>
                                                         <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
                                                         <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative z-10"></i>
                                                     </div>
@@ -516,24 +538,76 @@ const LiveChat = () => {
                                                     </div>
                                                 </div>
                                             );
+                                        } else if ((msg.sender === "admin") || (msg.role === "admin")) {
+                                            return (
+                                                <div key={index} className="flex justify-end pb-6 group">
+                                                    <div className="flex items-center group/arrow w-fit cursor-pointer">
+                                                        {/* Dropdown arrow (visible on hover of message group) */}
+                                                        <div className="relative">
+                                                            <i className="fa-solid fa-sort-down text-gray-400 opacity-0 group-hover:opacity-100 mb-1.5"></i>
+
+                                                            {/* Reply box (visible when hovering the arrow itself) */}
+                                                            <div className="absolute z-20 right-0 top-3 pt-3">
+                                                                <div className={`mt-1 text-xs p-0.5 bg-white rounded hidden transition-all duration-200 shadow ${replyTo === null ? "group-hover/arrow:block" : ""}`}>
+                                                                    <div className="flex-items-2 pl-3 hover:bg-gray-100 rounded cursor-pointer">
+                                                                        <i className="fa-solid fa-reply"></i>
+                                                                        <p 
+                                                                            onClick={() => setReplyTo(msg.message)}
+                                                                            className="p-2">Reply</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Message bubble */}
+                                                    <div className="flex flex-col max-w-[70%] items-end">
+                                                        <div className="font-bold text-[14px] text-gray-700">{msg.sender}</div>
+                                                        <div className="max-w-full w-fit flex gap-2 justify-end bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative  min-h-10">
+                                                            <p dangerouslySetInnerHTML={{ __html: msg.message }}></p>
+                                                            <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
+                                                            <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative z-10"></i>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Profile */}
+                                                    <div className="relative mt-[21px]">
+                                                        <div className="relative right-5 w-0 h-0 border-l-[0px] border-l-transparent border-r-[35px] border-r-transparent border-t-[25px] border-t-green-200"></div>
+                                                        {/* <Image 
+                                                            src="/Header/Profile.png"
+                                                            alt="Profile image"
+                                                            width={100}
+                                                            height={100}
+                                                            className="w-6 absolute top-2 left-1 border-1 border-green-600 rounded-2xl"
+                                                        /> */}
+                                                        <div className="absolute top-2 left-1 flex-items border-1 border-green-600 text-white font-bold h-6 w-6 bg-green-500 rounded-full text-sm">
+                                                            {msg.sender[0]}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
                                         } else {
                                             return (
                                                 <div key={index} className="flex justify-start mb-3 group">
                                                     <div className="relative left-3 group w-0 h-0 border-l-[30px] border-l-transparent border-r-[0px] border-r-transparent border-t-[15px] border-t-white"></div>
-                                                    <div className="max-w-[70%] flex gap-2 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-sm text-xs">
-                                                        <p>{msg.message}</p>
+                                                    <div className="max-w-[70%] min-h-10 flex gap-2 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-sm text-xs">
+                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }}></p>
                                                         <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
                                                     </div>
-                                                    <div className="relative flex group/arrow cursor-pointer h-8">
-                                                        <i className="fa-solid fa-sort-down text-gray-400 ml-5 opacity-0 group-hover:opacity-100"></i>
+                                                    <div className="flex items-center group/arrow cursor-pointer ">
+                                                        <div className="relative mb-1.5">
+                                                            <i className="fa-solid fa-sort-down text-gray-400 ml-5 opacity-0 group-hover:opacity-100"></i>
 
-                                                        {/* Reply box (visible when hovering the arrow itself) */}
-                                                        <div className={`absolute z-20 top-5 left-5 mt-1 text-xs p-0.5 bg-white rounded transition-all hidden duration-200 ${replyTo === null ? "group-hover/arrow:block" : ""}`}>
-                                                            <div 
-                                                                onClick={() => setReplyTo(msg.message)}
-                                                                className="flex-items-2 hover:bg-gray-100 pl-3">
-                                                                <i className="fa-solid fa-reply"></i>
-                                                                <p className="p-2 rounded cursor-pointer">Reply</p>
+                                                            {/* Reply box (visible when hovering the arrow itself) */}
+                                                            <div className="absolute z-20 top-3 left-5 pt-3">
+                                                                <div className={`mt-1 text-xs p-0.5 bg-white rounded transition-all hidden duration-200 shadow ${replyTo === null ? "group-hover/arrow:block" : ""}`}>
+                                                                    <div 
+                                                                        onClick={() => setReplyTo(msg.message)}
+                                                                        className="flex-items-2 hover:bg-gray-100 pl-3">
+                                                                        <i className="fa-solid fa-reply"></i>
+                                                                        <p className="p-2 rounded cursor-pointer">Reply</p>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -572,7 +646,9 @@ const LiveChat = () => {
                         {(selectedConversation && conversationMessages.length > 0 && !selectedChat.status) &&
                         <div className="bg-gray-50 gap-1 w-full text-xs flex-items-2 flex-col p-3 text-center">
                             <p>This chat has been resolved, so you can only send a message if the customer initiates a new chat</p>
-                            <button className="border px-3 py-1 border-gray-400 rounded-2xl text-black gap-1 text-sm font-bold">Send Template</button>
+                            <button className="border px-3 py-1 border-gray-400 hover:border-green-500 hover:text-green-500 rounded-2xl text-black gap-1 text-sm font-bold transition-all duration-150"
+                            onClick={() => setOpenTemplates(true)}
+                            >Send Template</button>
                         </div> }
 
                         <div>

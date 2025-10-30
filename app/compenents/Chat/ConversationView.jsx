@@ -74,7 +74,7 @@ const ConversationView = ({ setOpenConversationTab, onSelectConversation, select
           placeholder="Search for a view"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className='border border-gray-400 w-[92%] h-8 py-1 px-3 pl-8 rounded-l 
+          className='border border-gray-400 w-[92%] h-8 py-1 px-3 pl-8 rounded 
                 focus:outline-none focus:ring-0 
                 focus:rounded  text-sm
                 focus:border-green-500 hover:border-green-500'

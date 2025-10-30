@@ -1,14 +1,17 @@
 'use client';
+import EmojiPicker from "emoji-picker-react";
 import Image from "next/image";
-import { useRef, useEffect, useState } from "react";
 import ChatFileUpload from "./FileUploader";
+import { useRef, useEffect, useState } from "react";
 
 export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpenMediaLibrary, setConversationMessages }) {
   const textareaRef = useRef(null);
   const addFileRef = useRef(null);
+  // const emojiPickerRef = useRef(null); 
   const [message, setMessage] = useState("");
   const [openAddFile, setOpenAddFile] = useState(false);
   const [activeTab, setActiveTab] = useState("reply");
+  const [openEmoji, setOpenEmoji] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -23,44 +26,115 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
     };
   })
 
+  const onEmojiClick = (emojiData) => {
+    setMessage((prev) => prev + emojiData.emoji);
+    setOpenEmoji(false);  
+  };
+
   const formatText = (command) => {
     const textarea = textareaRef.current;
+    if (!textarea) return;
+
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
 
-    // Wrap selected text in markdown-like tags (simple simulation)
-    let before = message.substring(0, start);
-    let selected = message.substring(start, end);
-    let after = message.substring(end);
+    const markers = {
+      bold: ["**", "**"],
+      italic: ["*", "*"],
+      strikeThrough: ["~~", "~~"],
+    };
 
-    if (command === "bold") selected = `**${selected}**`;
-    else if (command === "italic") selected = `*${selected}*`;
-    else if (command === "strikeThrough") selected = `~~${selected}~~`;
+    const [leftMark, rightMark] = markers[command] || ["", ""];
+    const before = message.substring(0, start);
+    const selected = message.substring(start, end);
+    const after = message.substring(end);
 
-    const newText = before + selected + after;
+    let newText, newSelStart, newSelEnd;
+
+    if (start === end) {
+      // No selection: insert markers and place caret between them
+      newText = before + leftMark + rightMark + after;
+      newSelStart = newSelEnd = start + leftMark.length; // caret between markers
+    } else {
+      // Has selection: wrap the selected text
+      newText = before + leftMark + selected + rightMark + after;
+      newSelStart = start; // keep selection start at original start
+      newSelEnd = end + leftMark.length + rightMark.length; // selection extends by marker lengths
+    }
+
     setMessage(newText);
 
-    // Keep cursor position at end of inserted text
+    // Wait for the DOM to update and then set focus + selection
     setTimeout(() => {
       textarea.focus();
-      textarea.selectionStart = textarea.selectionEnd = end + 4;
+      textarea.selectionStart = newSelStart;
+      textarea.selectionEnd = newSelEnd;
     }, 0);
   };
 
   const handleSend = () => {
     const trimmedMessage = message.trim();
-
     if (!trimmedMessage) return;
-    const newMessage = {
-      sender : "Agent Spark",
-      role: "agent",
-      message: trimmedMessage,
-      timestamp: new Date().toISOString(),
+
+    const now = new Date();
+    const today = now.toISOString().split("T")[0]; // e.g., "2025-10-30"
+
+    // Convert simple markdown markers to HTML so the message renders with formatting
+    const convertMarkdownToHtml = (text) => {
+      if (!text) return text;
+      // Escape HTML special chars first to avoid accidental HTML injection
+      const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      let safe = escapeHtml(text);
+
+      // Bold: **text** -> <strong>text</strong>
+      safe = safe.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Italic: *text* -> <em>text</em>
+      safe = safe.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // Strike: ~~text~~ -> <s>text</s>
+      safe = safe.replace(/~~(.+?)~~/g, '<s>$1</s>');
+
+      return safe;
     };
 
-    setConversationMessages((prev) => [...prev, newMessage]);
+    const newMessage = {
+      sender: "Agent Spark",
+      role: "admin",
+      // store HTML-converted message so the chat view can render formatting
+      message: convertMarkdownToHtml(trimmedMessage),
+      timestamp: now.toISOString(),
+    };
+
+    setConversationMessages((prev) => {
+      const updatedMessages = [...prev];
+
+      // Check if previous message exists and is from today
+      const lastMsg = prev.length > 0 ? prev[prev.length - 1] : null;
+      let lastDate = null;
+
+      if (lastMsg) {
+        lastDate = new Date(lastMsg.timestamp).toISOString().split("T")[0];
+      }
+
+      // If no last message or date changed, add a date separator
+      if (!lastMsg || lastDate !== today) {
+        const dateMessage = {
+          sender: "System",
+          role: "date",
+          message: now.toLocaleDateString("en-GB"), // e.g., "30/10/2025"
+          timestamp: now.toISOString(),
+        };
+        updatedMessages.push(dateMessage);
+      }
+
+      // Add the new agent message
+      updatedMessages.push(newMessage);
+
+      return updatedMessages;
+    });
+
     setMessage("");
   };
+
 
   return (
     <div className="relative x-10 w-full flex items-center justify-between gap-5 bg-white shadow-sm p-3 px-5">
@@ -165,7 +239,12 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
                 <i className="fa-solid fa-strikethrough"></i>
               </button>
               <button className="hover:text-green-500 transition-all" title="Emoji">
-                <i className="fa-regular fa-face-smile"></i>
+                <i onClick={()=> setOpenEmoji(!openEmoji)} className="fa-regular fa-face-smile"></i>
+                {openEmoji && (
+                  <div className='absolute right-0 bottom-10'>
+                    <EmojiPicker onEmojiClick={onEmojiClick} />
+                  </div>
+                )}
               </button>
               <button
                 className="text-green-500 hover:text-green-700"

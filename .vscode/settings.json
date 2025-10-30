@@ -1,4 +1,7 @@
 {
-    "files.autoSave": "off",
-    "editor.wordWrap": "on"
+    "files.autoSave": "onFocusChange",
+    "editor.wordWrap": "on",
+    "github.copilot.enable": {
+        "*": false
+    }
 }

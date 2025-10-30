@@ -192,7 +192,117 @@ export const chatMessages = [
     chats: [
       {
         conversationId: "bot-chat-001",
-        user: "Guest user",
+        user: "Guest user 1",
+        channel: "Web",
+        startDate: "19/08/2025",
+        endDate: "27/08/2025",
+        messages: [
+          {
+            sender: "System",
+            role: "date",
+            message: "19/08/2025",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "How r u",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hello there! I'm doing well, thank you for asking. How can I help you today?",
+            timestamp: "2025-08-19T10:00:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "hi",
+            timestamp: "2025-08-19T10:01:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hi there! Is there anything I can help you with today?",
+            timestamp: "2025-08-19T10:02:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:06:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from Closed to New by System",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "You are exceeding your allocated Casual Leave balance. Your casual leave balance is 0.00. You are exceeding your allocated Casual Leave balance. Your casual leave balance is 0.00",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have the specific details on how to get your analytics data right now. That's something I'd need to check on. Is there anything else I can help you with today?",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:30:00Z"
+          }
+        ],
+        status: false
+      },
+      {
+        conversationId: "bot-chat-002",
+        user: "Guest user 2",
+        channel: "Web",
+        startDate: "16/10/2025",
+        endDate: "27/08/2025",
+        messages: [
+          {
+            sender: "System",
+            role: "date",
+            message: "16/08/2025",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hi there! How can I help you today?",
+            timestamp: "2025-10-16T11:30:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I'm a friendly customer support bot here to assist you!",
+            timestamp: "2025-10-16T11:35:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have enough information to complete that request.",
+            timestamp: "2025-10-16T11:40:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have the specific details on how to get your analytics data right now. That's something I'd need to check on.",
+            timestamp: "2025-10-16T11:45:00Z"
+          }
+        ],
+        status: true
+      },
+      {
+        conversationId: "bot-chat-003",
+        user: "Guest user 3",
         channel: "Web",
         startDate: "19/08/2025",
         endDate: "27/08/2025",
@@ -261,8 +371,8 @@ export const chatMessages = [
         status: false
       },
       {
-        conversationId: "bot-chat-002",
-        user: "Guest user",
+        conversationId: "bot-chat-004",
+        user: "Guest user 4",
         channel: "Web",
         startDate: "16/10/2025",
         endDate: "27/08/2025",
@@ -299,7 +409,227 @@ export const chatMessages = [
           }
         ],
         status: true
-      }
+      },
+      {
+        conversationId: "bot-chat-00 5",
+        user: "Guest user 5",
+        channel: "Web",
+        startDate: "19/08/2025",
+        endDate: "27/08/2025",
+        messages: [
+          {
+            sender: "System",
+            role: "date",
+            message: "19/08/2025",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "How r u",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hello there! I'm doing well, thank you for asking. How can I help you today?",
+            timestamp: "2025-08-19T10:00:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "hi",
+            timestamp: "2025-08-19T10:01:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hi there! Is there anything I can help you with today?",
+            timestamp: "2025-08-19T10:02:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:06:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from Closed to New by System",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "You are exceeding your allocated Casual Leave balance. Your casual leave balance is 0.00. You are exceeding your allocated Casual Leave balance. Your casual leave balance is 0.00",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have the specific details on how to get your analytics data right now. That's something I'd need to check on. Is there anything else I can help you with today?",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:30:00Z"
+          }
+        ],
+        status: false
+      },
+      {
+        conversationId: "bot-chat-006",
+        user: "Guest user 6",
+        channel: "Web",
+        startDate: "16/10/2025",
+        endDate: "27/08/2025",
+        messages: [
+          {
+            sender: "System",
+            role: "date",
+            message: "16/08/2025",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hi there! How can I help you today?",
+            timestamp: "2025-10-16T11:30:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I'm a friendly customer support bot here to assist you!",
+            timestamp: "2025-10-16T11:35:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have enough information to complete that request.",
+            timestamp: "2025-10-16T11:40:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have the specific details on how to get your analytics data right now. That's something I'd need to check on.",
+            timestamp: "2025-10-16T11:45:00Z"
+          }
+        ],
+        status: true
+      },
+      {
+        conversationId: "bot-chat-007",
+        user: "Guest user 7",
+        channel: "Web",
+        startDate: "19/08/2025",
+        endDate: "27/08/2025",
+        messages: [
+          {
+            sender: "System",
+            role: "date",
+            message: "19/08/2025",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "How r u",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hello there! I'm doing well, thank you for asking. How can I help you today?",
+            timestamp: "2025-08-19T10:00:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "hi",
+            timestamp: "2025-08-19T10:01:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hi there! Is there anything I can help you with today?",
+            timestamp: "2025-08-19T10:02:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:06:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from Closed to New by System",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "get analytics data",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have the specific details on how to get your analytics data right now. That's something I'd need to check on. Is there anything else I can help you with today?",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:30:00Z"
+          }
+        ],
+        status: false
+      },
+      {
+        conversationId: "bot-chat-008",
+        user: "Guest user 8",
+        channel: "Web",
+        startDate: "16/10/2025",
+        endDate: "27/08/2025",
+        messages: [
+          {
+            sender: "System",
+            role: "date",
+            message: "16/08/2025",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hi there! How can I help you today?",
+            timestamp: "2025-10-16T11:30:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I'm a friendly customer support bot here to assist you!",
+            timestamp: "2025-10-16T11:35:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have enough information to complete that request.",
+            timestamp: "2025-10-16T11:40:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have the specific details on how to get your analytics data right now. That's something I'd need to check on.",
+            timestamp: "2025-10-16T11:45:00Z"
+          }
+        ],
+        status: true
+      },
     ],
     bookMark: true,
   }
