@@ -1,9 +1,15 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 export default function ChatFileUpload({ files, setFiles, setOpenAddFile }) {
   // const [files, setFiles] = useState([]);
+  useEffect(() => {
+  return () => {
+    files.forEach(({ preview }) => URL.revokeObjectURL(preview));
+  };
+}, [files]);
+
 
   // handle upload
   const handleFileChange = (e) => {

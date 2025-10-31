@@ -639,3 +639,64 @@ h6.ce-header {
 .slide-out-X {
   animation: slideOutX 0.4s ease-in-out forwards;
 }
+
+/* Chat AI Animation */
+
+.dropdown {
+  opacity: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.group:hover .dropdown {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+
+/* CHECK BOX ANIMATION */
+@layer components {
+  /* hide the native checkbox */
+  .checkbox-wrapper-46 .inp-cbx {
+    @apply hidden;
+  }
+
+  /* hover effect for box border */
+  .checkbox-wrapper-46 .cbx:hover span:first-child {
+    @apply border-[#506EEC];
+  }
+
+  /* checked state */
+  .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child {
+    @apply bg-green-500 border-[#506EEC];
+    animation: wave-46 0.4s ease;
+  }
+
+  /* checkmark animation */
+  .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child svg {
+    stroke-dasharray: 16px;
+    stroke-dashoffset: 0;
+    @apply transition-all duration-300;
+  }
+
+  /* ripple effect */
+  .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+    background: var(--color-green-500);
+    display: block;
+    transform: scale(3.5);
+    opacity: 0;
+    border-radius: 50%;
+    transition: all 0.6s ease;
+  }
+
+  @keyframes wave-46 {
+    50% {
+      transform: scale(0.9);
+    }
+  }
+}
+

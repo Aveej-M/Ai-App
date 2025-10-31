@@ -80,7 +80,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   options={chatManage}
                   value={chatManage.find(option => option.value === manageChat)}
                   onChange={(e)=> setManageChat(e.value)}
-                  style={customStyles}
+                  styles={customStyles}
                   className="w-full text-sm"
                   components={{
                   IndicatorSeparator: () => null
@@ -106,13 +106,13 @@ const FilterTab = ({ setOpenFilterTab}) => {
                       <p>Agent Spark</p>
                       <i className="fa-solid fa-xmark text-xs text-red-500 hover:bg-white rounded-2xl px-0.5"></i>
                     </div>
-                  <input type="text" 
-                  className="min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]" 
-                  placeholder="Select Ai Chatbot"
-                  onClick={()=> setOpenAiChatbot(!openAiChatbot)}
-                  // onFocus={() => setOpenAiChatbot(true)}
-                  // onBlur={() => setOpenAiChatbot(false)}
-                  />
+                    <input type="text" 
+                    className="min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]" 
+                    placeholder="Select Ai Chatbot"
+                    onClick={()=> setOpenAiChatbot(!openAiChatbot)}
+                    // onFocus={() => setOpenAiChatbot(true)}
+                    // onBlur={() => setOpenAiChatbot(false)}
+                    />
                   </div>
                   {openAiChatbot && (
                     <div className="flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
@@ -192,7 +192,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   options={chatSource}
                   value={chatSource.find(option => option.value === sourceChat)}
                   onChange={(e)=> setSourceChat(e.value)}
-                  style={customStyles}
+                  styles={customStyles}
                   className="w-full text-sm"
                   components={{
                   IndicatorSeparator: () => null
@@ -207,7 +207,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                     <h2 className="font-bold text-gray-700">Connected Web Chatbots</h2>
                 </div>
                 <div className="relative w-full flex flex-col gap-3">
-                  <div className="topic-formInput mt-0!">
+                  <div className="topic-formInput form-input! mt-0!">
                     {/* <div className="flex items-center gap-1 bg-gray-300 w-fit rounded-2xl px-2 py-0.5 mt-1">
                       <p>Agent Spark</p>
                       <i className="fa-solid fa-xmark text-xs text-red-500 hover:bg-white rounded-2xl p-0.5"></i>
@@ -271,7 +271,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   value={converstaionStatus.find(option => option.value === statusConverstion)}
                   onChange={(e)=> setStatusConversation(e.value)}
                   placeholder="Select Bot"
-                  style={customStyles}
+                  styles={customStyles}
                   className="w-full text-sm"
                   components={{
                   IndicatorSeparator: () => null

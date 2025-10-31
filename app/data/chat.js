@@ -634,3 +634,21 @@ export const chatMessages = [
     bookMark: true,
   }
 ];
+
+export const aiChatData = [
+  { label: "Rephrase", value: "rephrase" },
+  { label: "Correct Grammar", value: "correct_grammar" },
+  { label: "Change Tone", value: "change_tone" },
+  { label: "Empathize", value: "empathize" },
+  { label: "Summarize", value: "summarize" },
+  { label: "Expand", value: "expand" },
+  { label: "Simplify", value: "simplify" },
+  { label: "Add Examples", value: "add_examples" },
+  { label: "Translate", value: "translate" },
+  { label: "Adjust Politeness", value: "adjust_politeness" },
+  { label: "Highlight Key Points", value: "highlight_key_points" },
+  { label: "Personalize", value: "personalize" },
+  { label: "Align with Brand Voice", value: "align_with_brand_voice" },
+  { label: "Remove Jargon", value: "remove_jargon" },
+];
+

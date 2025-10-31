@@ -35,6 +35,7 @@ const LiveChat = () => {
     const [openMediaLibrary, setOpenMediaLibrary] = useState(false);
     const [openCannedRes, setOpenCannedRes] = useState(false);
     const [openTemplates, setOpenTemplates] = useState(false);
+    const [openMerge, setOpenMerge] = useState(false);
 
     useEffect(() => {
         const bookmarked = chatMessages.find((chat) => chat.bookMark === true);
@@ -261,7 +262,7 @@ const LiveChat = () => {
                                 className="fa-solid fa-magnifying-glass text-sm hover:bg-green-200 px-2 py-2 rounded-2xl transition-all duration-300 cursor-pointer"></i>
                             </div>
                             <div className='relative group rounded-2xl'>
-                                <i className="fa-solid fa-shuffle hover:bg-green-200 px-2 py-2 rounded-2xl transition-all duration-300 cursor-pointer"></i>
+                                <i onClick={()=> setOpenMerge(!openMerge)} className="fa-solid fa-shuffle hover:bg-green-200 px-2 py-2 rounded-2xl transition-all duration-300 cursor-pointer"></i>
                                 <span className='absolute -top-10 -left-8 z-30 w-25 py-1 hidden group-hover:block bg-black/80 text-white rounded text-sm text-center'>Bulk Update</span>
                                 <div className="absolute -top-3 left-3 z-30 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-black/80 hidden group-hover:block" />
                             </div>
@@ -281,6 +282,53 @@ const LiveChat = () => {
                 </div>
 
                 <div className="flex flex-1 h-full overflow-y-auto flex-col justify-between">
+                    {openMerge && (
+                        <div className="justify-items px-5 mb-2">
+                            <div className="flex-items-2 gap-2 text-sm"> 
+                                <div className="checkbox-wrapper-46 relative inline-block">
+                                    <input
+                                        id="cbx-46"
+                                        type="checkbox"
+                                        className="inp-cbx absolute opacity-0"
+                                    />
+                                    <label htmlFor="cbx-46" className="cbx flex items-center cursor-pointer select-none">
+                                        <span className="relative w-[16px] h-[16px] border border-[#9098A9] hover:border-green-500 rounded-[3px] transition-all duration-200 ease-in-out flex items-center justify-center">
+                                        <svg
+                                            width="10"
+                                            height="8"
+                                            viewBox="0 0 12 10"
+                                            className="absolute top-[3px] left-[2px] stroke-gray-50 stroke-[2px] fill-none transition-all duration-300 delay-[100ms]"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                        >
+                                            <polyline points="1.5 6 4.5 9 10.5 1" />
+                                        </svg>
+                                        </span>
+                                    </label>
+                                </div>
+                                <p>Select All</p>
+                                <span className="bg-green-500 h-5 w-5 rounded-full flex-items-2 text-white">0</span>
+                            </div>
+
+                            <div className="flex items-center gap-2 text-sm font-bold">
+                                <div onClick={()=> setOpenMerge(false)} className="text-red-500 bg-red-200 hover:bg-red-300 px-2 py-0.5 rounded-2xl min-w-fit cursor-pointer">
+                                    <span ><i className="fa-solid fa-xmark mr-2"></i></span>
+                                    Cancel
+                                </div>
+                                <div className="bg-gray-200 px-2 py-0.5 rounded-2xl text-gray-400 flex-items-2 gap-1 cursor-pointer">
+                                    <Image 
+                                    src="/Chat/merge-gray.png"
+                                    alt="Merge icon"
+                                    width={50}
+                                    height={50}
+                                    className="w-4"
+                                    />
+                                    Update
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* <div> */}
                         {chatMessages.map((conversationGroup, idx) => {
                         if (conversationGroup.name === selectedConversation) {
@@ -291,9 +339,33 @@ const LiveChat = () => {
                                     <div
                                     key={chat.conversationId}
                                     className={`border-b border-b-gray-400 hover:bg-gray-100 justify-items py-3 px-6 cursor-pointer ${selectedChat && selectedChat.conversationId === chat.conversationId ? 'bg-gray-200 hover:bg-gray-200' : ''}`}
-                                    onClick={()=> handelSelectConversationMsg(chat.conversationId, msgIdx)}
+                                    onClick={!openMerge ? ()=> handelSelectConversationMsg(chat.conversationId, msgIdx) : undefined}
                                     >
                                         <div className="flex-items">
+                                            {openMerge && (
+                                                <div className="checkbox-wrapper-46 relative inline-block">
+                                                    <input
+                                                        id={chat.conversationId}
+                                                        type="checkbox"
+                                                        className="inp-cbx absolute opacity-0"
+                                                    />
+                                                    <label htmlFor={chat.conversationId} className="cbx flex items-center cursor-pointer select-none">
+                                                        <span className="relative w-[16px] h-[16px] border border-[#9098A9] hover:border-green-500 rounded-[3px] transition-all duration-200 ease-in-out flex items-center justify-center">
+                                                        <svg
+                                                            width="10"
+                                                            height="8"
+                                                            viewBox="0 0 12 10"
+                                                            className="absolute top-[3px] left-[2px] stroke-gray-50 stroke-[2px] fill-none transition-all duration-300 delay-[100ms]"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        >
+                                                            <polyline points="1.5 6 4.5 9 10.5 1" />
+                                                        </svg>
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            )}
+
                                             <div className="flex-items text-white font-bold h-8 w-8 bg-green-600 rounded-full">
                                                 {chat.user[0]}
                                             </div>
@@ -488,7 +560,15 @@ const LiveChat = () => {
                                 <div className=" px-3 h-full">
                                     
                                     {(selectedConversation && conversationMessages.length > 0) ? (conversationMessages).map((msg, index) => {
-                                        if (msg.sender === "System") {
+                                        if (msg.sender === "System" && msg.role === "date") {
+                                            return (
+                                                <div key={index} className="flex justify-center my-3 sticky top-0 z-10">
+                                                    <span className="bg-white text-gray-500 text-xs px-4 py-2 rounded shadow-5">
+                                                        {msg.message}
+                                                    </span>
+                                                </div>
+                                            );
+                                        } else if ((msg.sender === "System") || (msg.role === "system")) {
                                             return (
                                                 <div key={index} className="flex justify-center my-3">
                                                     <span className="bg-white text-gray-500 text-xs px-4 py-2 rounded shadow">
@@ -519,10 +599,12 @@ const LiveChat = () => {
                                                     </div>
 
                                                     {/* Message bubble */}
-                                                    <div className="max-w-[70%] flex gap-2 bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative min-h-10">
-                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }}></p>
-                                                        <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
-                                                        <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative z-10"></i>
+                                                    <div className="max-w-[70%] flex flex-col gap-2 bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative min-h-10">
+                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }} className="mr-5"></p>
+                                                        <div className="flex justify-end gap-3">
+                                                            <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
+                                                            <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative"></i>
+                                                        </div>
                                                     </div>
 
                                                     {/* Profile */}
@@ -543,7 +625,7 @@ const LiveChat = () => {
                                                 <div key={index} className="flex justify-end pb-6 group">
                                                     <div className="flex items-center group/arrow w-fit cursor-pointer">
                                                         {/* Dropdown arrow (visible on hover of message group) */}
-                                                        <div className="relative">
+                                                        <div className="relative top-2">
                                                             <i className="fa-solid fa-sort-down text-gray-400 opacity-0 group-hover:opacity-100 mb-1.5"></i>
 
                                                             {/* Reply box (visible when hovering the arrow itself) */}
@@ -561,25 +643,134 @@ const LiveChat = () => {
                                                     </div>
 
                                                     {/* Message bubble */}
-                                                    <div className="flex flex-col max-w-[70%] items-end">
+                                                    <div className="flex flex-col max-w-[90%] items-end">
                                                         <div className="font-bold text-[14px] text-gray-700">{msg.sender}</div>
-                                                        <div className="max-w-full w-fit flex gap-2 justify-end bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative  min-h-10">
-                                                            <p dangerouslySetInnerHTML={{ __html: msg.message }}></p>
-                                                            <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
-                                                            <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative z-10"></i>
+                                                        <div className="max-w-full w-fit flex flex-col gap-2 justify-end bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative  min-h-10">
+                                                            <p dangerouslySetInnerHTML={{ __html: msg.message }} className="mr-5"></p>
+
+                                                            
+                                                            {/* Attachment rendering */}
+                                                            {msg.attachments && msg.attachments.length > 0 && (
+                                                                <div className="mt-2 flex flex-col gap-2">
+                                                                    {msg.attachments.map((file, i) => {
+                                                                    const fileType = file.type || "";
+
+                                                                    // 🖼️ Image preview
+                                                                    if (fileType.startsWith("image/")) {
+                                                                        return (
+                                                                        <div
+                                                                            key={i}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            className="bg-[#dcf8c6] rounded-lg p-2 shadow-md max-w-[90%]"
+                                                                        >
+                                                                            <img
+                                                                            src={file.preview}
+                                                                            alt={file.name}
+                                                                            className="rounded-lg w-full max-w-[250px] h-auto object-contain"
+                                                                            />
+                                                                        </div>
+                                                                        );
+                                                                    }
+
+                                                                    // 🎥 Video preview
+                                                                    if (fileType.startsWith("video/")) {
+                                                                        return (
+                                                                        <div
+                                                                            key={i}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            className="bg-[#dcf8c6] rounded-lg p-2 shadow-md max-w-[90%]"
+                                                                        >
+                                                                            <video
+                                                                            controls
+                                                                            preload="metadata"
+                                                                            src={file.preview}
+                                                                            className="rounded-lg w-full max-w-[250px] h-auto pointer-events-auto"
+                                                                            />
+                                                                        </div>
+                                                                        );
+                                                                    }
+
+                                                                    // 🎧 Audio preview
+                                                                    if (fileType.startsWith("audio/")) {
+                                                                        return (
+                                                                        <div
+                                                                            key={i}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            className="bg-[#dcf8c6] rounded-lg p-2 shadow-md max-w-[90%] flex items-center"
+                                                                        >
+                                                                            <i className="fa-solid fa-headphones text-green-700 mr-2"></i>
+                                                                            <audio
+                                                                            controls
+                                                                            preload="auto"
+                                                                            src={file.preview}
+                                                                            className="w-[300px] pointer-events-auto"
+                                                                            />
+                                                                        </div>
+                                                                        );
+                                                                    }
+
+                                                                    // 📄 Documents (PDF, DOCX, etc.)
+                                                                    return (
+                                                                        <div
+                                                                        key={i}
+                                                                        className="bg-[#dcf8c6] rounded-lg p-3 shadow-md max-w-[90%] flex items-center gap-3"
+                                                                        >
+                                                                        {/* <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                                                                            <i className="fa-solid fa-file-pdf text-red-600 text-lg"></i>
+                                                                        </div> */}
+                                                                        <Image
+                                                                            src={
+                                                                            file.name.endsWith(".pdf")
+                                                                                ? "/Chat/pdf_file.png"
+                                                                                : file.name.endsWith(".doc") || file.name.endsWith(".docx")
+                                                                                ? "/Chat/file.png"
+                                                                                : file.name.endsWith(".xls") || file.name.endsWith(".xlsx")
+                                                                                ? "/Chat/CSV.png"
+                                                                                : file.name.endsWith(".txt")
+                                                                                ? "/Chat/txt.png"
+                                                                                : "/Chat/file.png" // default icon
+                                                                            }
+                                                                            alt={`${file.name} icon`}
+                                                                            height={50}
+                                                                            width={50}
+                                                                            className="rounded-md object-contain"
+                                                                        />
+                                                                        <div className="flex flex-col">
+                                                                            <p className="text-sm font-semibold text-gray-800 truncate max-w-[150px]">
+                                                                            {file.name}
+                                                                            </p>
+                                                                            <p className="text-xs text-gray-500">
+                                                                            {(file.size / 1024).toFixed(2)} KB
+                                                                            </p>
+                                                                        </div>
+                                                                        <a
+                                                                            href={file.preview}
+                                                                            download={file.name}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="ml-auto"
+                                                                        >
+                                                                            <i className="fa-solid fa-download text-gray-600 hover:text-gray-800"></i>
+                                                                        </a>
+                                                                        </div>
+                                                                    );
+                                                                    })}
+                                                                </div>
+                                                            )}
+
+
+
+
+                                                            <div className="flex justify-end gap-3">
+                                                                <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
+                                                                <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative"></i>
+                                                            </div>
                                                         </div>
                                                     </div>
 
                                                     {/* Profile */}
                                                     <div className="relative mt-[21px]">
                                                         <div className="relative right-5 w-0 h-0 border-l-[0px] border-l-transparent border-r-[35px] border-r-transparent border-t-[25px] border-t-green-200"></div>
-                                                        {/* <Image 
-                                                            src="/Header/Profile.png"
-                                                            alt="Profile image"
-                                                            width={100}
-                                                            height={100}
-                                                            className="w-6 absolute top-2 left-1 border-1 border-green-600 rounded-2xl"
-                                                        /> */}
                                                         <div className="absolute top-2 left-1 flex-items border-1 border-green-600 text-white font-bold h-6 w-6 bg-green-500 rounded-full text-sm">
                                                             {msg.sender[0]}
                                                         </div>
@@ -590,7 +781,7 @@ const LiveChat = () => {
                                             return (
                                                 <div key={index} className="flex justify-start mb-3 group">
                                                     <div className="relative left-3 group w-0 h-0 border-l-[30px] border-l-transparent border-r-[0px] border-r-transparent border-t-[15px] border-t-white"></div>
-                                                    <div className="max-w-[70%] min-h-10 flex gap-2 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-sm text-xs">
+                                                    <div className="max-w-[70%] min-h-10 flex flex-col gap-2 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-sm text-xs">
                                                         <p dangerouslySetInnerHTML={{ __html: msg.message }}></p>
                                                         <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
                                                     </div>
@@ -653,7 +844,7 @@ const LiveChat = () => {
 
                         <div>
                             {selectedFile && (
-                                <div className="absolute top-17 w-[-webkit-fill-available] h-[-webkit-fill-available] mb-35 shadow-sm overflow-hidden bg-white">
+                                <div className="absolute z-10 top-17 w-[-webkit-fill-available] h-[-webkit-fill-available] mb-35 shadow-sm overflow-hidden bg-white">
                                     <div className="px-2 py-4 bg-gray-300 text-center text-gray-700 text-sm font-medium">
                                         {/* <span className="">X</span> */}
                                         <i onClick={() => setFiles([])}

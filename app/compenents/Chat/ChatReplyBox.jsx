@@ -1,13 +1,15 @@
 'use client';
-import EmojiPicker from "emoji-picker-react";
 import Image from "next/image";
 import ChatFileUpload from "./FileUploader";
+import EmojiPicker from "emoji-picker-react";
+import { aiChatData } from "../../data/chat";
 import { useRef, useEffect, useState } from "react";
 
 export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpenMediaLibrary, setConversationMessages }) {
   const textareaRef = useRef(null);
   const addFileRef = useRef(null);
-  // const emojiPickerRef = useRef(null); 
+  const timeoutRef = useRef(null);
+  const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [openAddFile, setOpenAddFile] = useState(false);
   const [activeTab, setActiveTab] = useState("reply");
@@ -74,7 +76,8 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
 
   const handleSend = () => {
     const trimmedMessage = message.trim();
-    if (!trimmedMessage) return;
+    // allow sending when there is text OR there are files attached
+    if (!trimmedMessage && files.length === 0) return;
 
     const now = new Date();
     const today = now.toISOString().split("T")[0]; // e.g., "2025-10-30"
@@ -96,48 +99,83 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
       return safe;
     };
 
-    const newMessage = {
-      sender: "Agent Spark",
-      role: "admin",
-      // store HTML-converted message so the chat view can render formatting
-      message: convertMarkdownToHtml(trimmedMessage),
-      timestamp: now.toISOString(),
-    };
+    let newMessages = [];
+    // if text message exists
+    if (trimmedMessage) {
+      newMessages.push({
+        sender: "Agent Spark",
+        role: "admin",
+        message: convertMarkdownToHtml(trimmedMessage),
+        timestamp: now.toISOString(),
+      });
+    }
+
+    // if files exist, push each as a separate message
+    if (files.length > 0) {
+      files.forEach(({ file, preview }) => {
+      const fileMessage = {
+        sender: "Agent Spark",
+        role: "admin",
+        message: "",
+        attachments: [
+          {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            preview, // ✅ must include this
+          },
+        ],
+        timestamp: now.toISOString(),
+      };
+      newMessages.push(fileMessage);
+    });
+
+    }
 
     setConversationMessages((prev) => {
       const updatedMessages = [...prev];
+      const lastMsg = prev[prev.length - 1];
+      const lastDate = lastMsg ? new Date(lastMsg.timestamp).toISOString().split("T")[0] : null;
 
-      // Check if previous message exists and is from today
-      const lastMsg = prev.length > 0 ? prev[prev.length - 1] : null;
-      let lastDate = null;
-
-      if (lastMsg) {
-        lastDate = new Date(lastMsg.timestamp).toISOString().split("T")[0];
-      }
-
-      // If no last message or date changed, add a date separator
       if (!lastMsg || lastDate !== today) {
-        const dateMessage = {
+        updatedMessages.push({
           sender: "System",
           role: "date",
-          message: now.toLocaleDateString("en-GB"), // e.g., "30/10/2025"
+          message: now.toLocaleDateString("en-GB"),
           timestamp: now.toISOString(),
-        };
-        updatedMessages.push(dateMessage);
+        });
       }
 
-      // Add the new agent message
-      updatedMessages.push(newMessage);
-
+      updatedMessages.push(...newMessages);
       return updatedMessages;
     });
 
+    // clear input and attached files after sending
     setMessage("");
+    // revoke object URLs created for previews to avoid memory leaks
+    setTimeout(() => {
+      try {
+        files.forEach(f => f.preview && URL.revokeObjectURL(f.preview));
+      } catch (e) {}
+    }, 3000);
+    setFiles([]);
+  };
+
+  const handleMouseEnter = () => {
+    clearTimeout(timeoutRef.current);
+    setOpen(true);
+  };
+  const handleMouseLeave = () => {
+    // add a tiny delay so it doesn’t close too abruptly
+    timeoutRef.current = setTimeout(() => setOpen(false), 150);
+  };
+   const handleOptionClick = () => {
+    setOpen(false);
   };
 
 
   return (
-    <div className="relative x-10 w-full flex items-center justify-between gap-5 bg-white shadow-sm p-3 px-5">
+    <div className="relative z-10 x-10 w-full flex items-center justify-between gap-5 bg-white shadow-sm p-3 px-5">
 
       <div className="flex flex-col w-full gap-3">
         {/* Tabs */}
@@ -216,38 +254,40 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
             ></textarea>
 
             {/* Floating Toolbar (inside textarea on right side) */}
-            <div className="absolute top-1/2 right-5 -translate-y-1/2 flex items-center gap-3 text-gray-500">
+            <div className="absolute top-1/2 right-5 -translate-y-1/2 flex items-center text-gray-500">
               <button
                 onClick={() => formatText("bold")}
-                className="hover:text-green-500 transition-all font-bold"
+                className="hover:text-green-500 transition-all font-bold hover:bg-gray-200 px-3 py-1 rounded-full"
                 title="Bold"
               >
                 <i className="fa-solid fa-b"></i>
               </button>
               <button
                 onClick={() => formatText("italic")}
-                className="italic hover:text-green-500 transition-all"
+                className="italic hover:text-green-500 transition-all hover:bg-gray-200 px-2.5 py-1 rounded-full"
                 title="Italic"
               >
                 <i className="fa-solid fa-italic"></i>
               </button>
               <button
                 onClick={() => formatText("strikeThrough")}
-                className="hover:text-green-500 transition-all"
+                className="hover:text-green-500 transition-all hover:bg-gray-200 px-2 py-1 rounded-full"
                 title="Strikethrough"
               >
                 <i className="fa-solid fa-strikethrough"></i>
               </button>
-              <button className="hover:text-green-500 transition-all" title="Emoji">
+              <div className="hover:text-green-500 transition-all cursor-pointer hover:bg-gray-200 px-2 py-1 rounded-full" title="Emoji">
                 <i onClick={()=> setOpenEmoji(!openEmoji)} className="fa-regular fa-face-smile"></i>
                 {openEmoji && (
                   <div className='absolute right-0 bottom-10'>
                     <EmojiPicker onEmojiClick={onEmojiClick} />
                   </div>
                 )}
-              </button>
+              </div>
               <button
-                className="text-green-500 hover:text-green-700"
+                onMouseEnter={message.length > 11 ? handleMouseEnter : undefined}
+                onMouseLeave={message.length > 11 ? handleMouseLeave : undefined}
+                className={`relative z-20 py-1.5 px-2 rounded-full ${message === "" ? "cursor-not-allowed! grayscale-100" : "cursor-pointer! group hover:bg-gray-200"}`}
                 title="AI Suggest"
               >
                 <Image
@@ -257,6 +297,28 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
                   width={20}
                   className="w-5"
                 />
+                {message.length < 12 && (
+                  <>
+                    <span className='absolute -top-12 -left-28 z-30 w-max py-2 px-3 hidden group-hover:block bg-black/90 text-white rounded text-sm text-center'>Add message to let AI help you</span>
+                    <div className="absolute -top-3 left-3 z-30 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-black/90 hidden group-hover:block" />
+                  </>
+                )}
+                
+                <div className={`absolute z-20 bottom-8 right-0 pb-3 transition-all duration-200 origin-top ${
+                  open
+                    ? "block scale-y-100"
+                    : "scale-y-0 pointer-events-none"
+                }`}>
+                  <div className="bg-white text-left p-2 shadow-5 w-max rounded">
+                    {aiChatData.map(({label, value}, index) => (
+                      <div key={index} 
+                      onClick={handleOptionClick}
+                      className="px-2 py-1 hover:bg-gray-100 w-full rounded">
+                        {label}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </button>
             </div>
           </div>
@@ -265,7 +327,7 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
           className="transition-all cursor-none"
           >
             <i
-              className={`fa-solid fa-paper-plane text-[18px] rotate-45 bg-clip-text hover:from-green-400 hover:to-green-600 ${message === "" ? "cursor-not-allowed text-gray-300" : "cursor-pointer hover:scale-125 transition-all duration-150 text-transparent bg-gradient-to-r from-green-500 to-green-900"}`}
+              className={`${message === "" ? "cursor-not-allowed text-gray-400" : "cursor-pointer text-transparent bg-gradient-to-r from-green-500 to-green-900 hover:scale-125 transition-all duration-150"} fa-solid fa-paper-plane text-[18px] rotate-45 bg-clip-text hover:from-green-400 hover:to-green-600`}
             ></i>
           </button>
         </div>
