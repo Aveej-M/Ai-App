@@ -10,8 +10,8 @@ const SendTemplates = ({ setOpenTemplates }) => {
     }
 
   return (
-    <div className="h-full w-full bg-black/80 absolute top-0 left-0 z-50 flex justify-center p-10">
-        <div className={`bg-white w-full h-full rounded p-5 ${animateOut ? "popup-out" : "popup-in"}`}>
+    <div className="h-screen w-full bg-black/80 absolute top-0 left-0 z-50 flex justify-center p-10">
+        <div className={`bg-white w-[80%] h-full rounded p-5 ${animateOut ? "popup-out" : "popup-in"}`}>
             <div className="justify-items mb-2">
                 <h2 className="text-[16px] font-bold">Select Template</h2>
                 <i onClick={()=> setOpenTemplates(false)} className="fa-solid fa-xmark text-[20px] text-gray-500 hover:bg-gray-300 px-1 py-0.5 rounded-full cursor-pointer"></i>
@@ -38,9 +38,29 @@ const SendTemplates = ({ setOpenTemplates }) => {
                 </div>
             </div>
 
-            <div className="w-full h-[70dvh] mt-5 flex-items-2 flex-col text-gray-500">
+            <div className="w-full h-[65dvh] mt-5 flex-items-2 flex-col text-gray-500">
                 <i className="fa-solid fa-inbox text-5xl"></i> 
                 <p className="">No templates found</p>
+            </div>
+
+            <div className="flex items-end cursor-not-allowed">
+                <div className="flex items-center gap-2">
+                    <i className="fa-solid fa-angles-left cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"></i>
+                    <i className="fa-solid fa-chevron-left cursor-pointer text-gray-600 hover:text-gray-500"></i>
+                    {/* <p className="border-2 border-green-500 bg-green-200 px-2 py-0.5 text-green-600 rounded ">1</p> */}
+                    <i className="fa-solid fa-chevron-right cursor-pointer text-gray-600 hover:text-gray-500"></i>
+                    <i className="fa-solid fa-angles-right cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"></i>
+                </div>
+
+                <div className="w-full flex justify-end gap-3 pt-3">
+                    <button className="h-8 border px-4 text-gray-400 text-sm rounded-3xl cursor-not-allowed!">
+                        Reset
+                    </button>
+
+                    <button className={`h-8 border px-4 text-gray-400 text-sm rounded-3xl cursor-not-allowed!`}>
+                        Continue
+                    </button>
+                </div>
             </div>
         </div>
     </div>

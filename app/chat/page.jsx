@@ -5,20 +5,32 @@ import FilterTab from "../compenents/Chat/FilterTab";
 import AddContacts from "../compenents/Chat/AddContacts";
 import MediaLibrary from "../compenents/Chat/MediaLibrary";
 import ChatReplyBox from "../compenents/Chat/ChatReplyBox";
-import { assignOptions, chatMessages } from "../data/chat";
+import BulkUpdate from "../compenents/Chat/BulkUpdate";
+import { assignOptions, chatMessages as initialChatData  } from "../data/chat";
 import SendTemplates from "../compenents/Chat/SendTemplates";
 import CannedResponse from "../compenents/Chat/CannedResponse";
 import ConversationView from "../compenents/Chat/ConversationView";
 
 const LiveChat = () => {
+    const [chatMessages, setChatMessages] = useState(initialChatData);
     const [bookMark, setBookMark] = useState(true);
     const [openConversationTab, setOpenConversationTab] = useState(false); 
     const [openSearchTab, setOpenSearchTab] = useState(false);
     const [openFilterTab, setOpenFilterTab] = useState(false);
     const [openAddContacts, setOpenAddContacts] = useState(false);
+
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [selectedChat, setSelectedChat] = useState(null);
+    const [currentChatIndex, setCurrentChatIndex] = useState(0);
     const [conversationMessages, setConversationMessages] = useState([]);
+    const [selectedChats, setSelectedChats] = useState([]);
+    const [isSelectAll, setIsSelectAll] = useState(false);
+    const selectedGroup = chatMessages.find(
+        (g) => g.name === selectedConversation
+    );
+    const [openBulkUpdate, setOpenBulkUpdate] = useState(false);
+    const [selectedConversations, setSelectedConversations] = useState([]);
+
     const [replyTo, setReplyTo] = useState(null);
     const [openAssignUser, setOpenAssignUser] = useState(false);
     const [assignedName, setAssignedName] = useState("Agent Spark");
@@ -43,6 +55,30 @@ const LiveChat = () => {
         setSelectedConversation(bookmarked.name);
         }
     }, []);
+
+    useEffect(() => {
+        const allChatIds = selectedGroup?.chats.map((chat) => chat.conversationId) || [];
+        setIsSelectAll(
+            allChatIds.length > 0 && allChatIds.every((id) => selectedChats.includes(id))
+        );
+    }, [selectedChats, selectedGroup]);
+
+    // Keep selectedChat and conversationMessages in sync when index/group/data change
+    useEffect(() => {
+        const selectedGroup = chatMessages.find(
+            (g) => g.name === selectedConversation
+        );
+        if (!selectedGroup) return;
+
+        const chat = selectedGroup.chats[currentChatIndex];
+        if (chat) {
+            setSelectedChat(chat);
+            setConversationMessages(chat.messages || []);
+        } else {
+            setSelectedChat(null);
+            setConversationMessages([]);
+        }
+    }, [currentChatIndex, selectedConversation, chatMessages]);
     
     const handleAudioPlay = (playingRef) => {
         // Play all audio elements when one starts playing
@@ -92,6 +128,60 @@ const LiveChat = () => {
         });
     };
 
+    const handleCheckboxToggle = (conversationId) => {
+        setSelectedChats((prevSelected) => 
+            prevSelected.includes(conversationId)
+            ? prevSelected.filter((id) => id !== conversationId)
+            : [...prevSelected, conversationId]
+        );
+    };
+
+    const handleNavigateChat = (direction) => {
+        const selectedGroup = chatMessages.find(
+            (g) => g.name === selectedConversation
+        );
+
+        if (!selectedGroup) return;
+
+        const maxIndex = Math.max(selectedGroup.chats.length - 1, 0);
+
+        // compute new index synchronously so we can update selectedChat immediately
+        let newIndex = currentChatIndex || 0;
+        if (direction === "first") newIndex = 0;
+        else if (direction === "last") newIndex = maxIndex;
+        else if (direction === "prev") newIndex = Math.max(newIndex - 1, 0);
+        else if (direction === "next") newIndex = Math.min(newIndex + 1, maxIndex);
+
+        setCurrentChatIndex(newIndex);
+
+        const newChat = selectedGroup.chats[newIndex];
+        if (newChat) {
+            setSelectedChat(newChat);
+            setConversationMessages(newChat.messages || []);
+        } else {
+            setSelectedChat(null);
+            setConversationMessages([]);
+        }
+    };
+
+
+    const handleSelectAllToggle = () => {
+        if (isSelectAll) {
+            setSelectedChats([]); // Unselect all
+        } else {
+            const allChatIds = selectedGroup.chats.map((chat) => chat.conversationId);
+            setSelectedChats(allChatIds); // Select all
+        }
+        setIsSelectAll((prev) => !prev);
+    };
+    // const handleSelectAll = (chats) => {
+    //     if (selectedConversations.length === chats.length) {
+    //     setSelectedConversations([]);
+    //     } else {
+    //     setSelectedConversations(chats.map((chat) => chat.conversationId));
+    //     }
+    // };
+
     // Handler for selecting a conversation from ConversationView
     const handleSelectConversation = (conversationName) => {
         setSelectedConversation(conversationName);
@@ -106,6 +196,7 @@ const LiveChat = () => {
         if (found && found.chats && found.chats.length > 0 && found.chats[idx].conversationId === conversationId) {
             setSelectedChat(foundChat)
             setConversationMessages(found.chats[idx].messages || []);
+            setCurrentChatIndex(idx);
         } else {
             setConversationMessages([]);
         }
@@ -156,6 +247,40 @@ const LiveChat = () => {
         return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
     };
 
+    // Return a suitable reply string for a message.
+    // If the message has attachments, prefer their filenames (comma separated).
+    // Otherwise fall back to the message text (stripped of HTML tags if present).
+    const getReplyText = (msg) => {
+        if (!msg) return "";
+
+        try {
+            if (msg.attachments && Array.isArray(msg.attachments) && msg.attachments.length > 0) {
+                const names = msg.attachments.map((f) => {
+                    // try multiple common filename properties
+                    return (
+                        f.name || f.fileName || f.filename || f.originalname ||
+                        (f.file && (f.file.name || f.file.fileName)) ||
+                        // fallback to url if no name
+                        f.url || f.src || 'attachment'
+                    );
+                });
+                return names.join(', ');
+            }
+
+            // If msg.message contains HTML, strip simple tags for display
+            if (typeof msg.message === 'string') {
+                // remove basic HTML tags
+                const stripped = msg.message.replace(/<[^>]*>/g, '').trim();
+                return stripped || msg.message;
+            }
+
+            // final fallback
+            return String(msg.message || 'attachment');
+        } catch (e) {
+            return msg.message || '';
+        }
+    };
+
     const handleRemoveFile = (index) => {
         setFiles((prev) => {
         URL.revokeObjectURL(prev[index].preview);
@@ -178,9 +303,50 @@ const LiveChat = () => {
 
         setConversationMessages((prev) => [...prev, newMessage])
         setSelectedChat((prev) => ({
-            ...prev, status: false
+            ...prev, status: "closed"
         }));
     }
+    
+    const updateSelectedChats = (updateField, newValue) => {
+        const now = new Date();
+        const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        const systemMsg = `Conversation updated to ${newValue} by Agent at ${time}`;
+
+        setChatMessages((prev) =>
+            prev.map((group) => ({
+                ...group,
+                chats: group.chats.map((chat) => {
+                    if (selectedChats.includes(chat.conversationId)) {
+                        const updatedMessages = chat.messages
+                            ? [
+                                  ...chat.messages,
+                                  {
+                                      sender: 'System',
+                                      role: 'system',
+                                      message: systemMsg,
+                                      timestamp: new Date().toISOString(),
+                                  },
+                              ]
+                            : chat.messages;
+
+                        return {
+                            ...chat,
+                            [updateField]: newValue,
+                            messages: updatedMessages,
+                        };
+                    }
+                    return chat;
+                }),
+            }))
+        );
+
+        // clear selection after update
+        setSelectedChats([]);
+        setOpenBulkUpdate(false);
+        setOpenMerge(false);
+    };
+    
+
 
     return (
         <div className='pt-16.5 text-black h-screen w-full flex'>
@@ -211,6 +377,14 @@ const LiveChat = () => {
             {openTemplates && (
                 <SendTemplates setOpenTemplates={setOpenTemplates} />
             )}
+            {openBulkUpdate && (
+                <BulkUpdate 
+                    setOpneBulkUpdate={setOpenBulkUpdate}
+                    selectedIds={selectedChats}
+                    onUpdate={updateSelectedChats}
+                />
+            )}
+            
 
             {/* Left Area */}
             <div className='w-[30%] h-screen -top-15 pt-15 pb-12 bg-gray-50 relative flex flex-col'>
@@ -289,6 +463,8 @@ const LiveChat = () => {
                                     <input
                                         id="cbx-46"
                                         type="checkbox"
+                                        checked={isSelectAll}
+                                        onChange={handleSelectAllToggle}
                                         className="inp-cbx absolute opacity-0"
                                     />
                                     <label htmlFor="cbx-46" className="cbx flex items-center cursor-pointer select-none">
@@ -307,7 +483,7 @@ const LiveChat = () => {
                                     </label>
                                 </div>
                                 <p>Select All</p>
-                                <span className="bg-green-500 h-5 w-5 rounded-full flex-items-2 text-white">0</span>
+                                <span className="bg-green-500 h-5 w-5 rounded-full flex-items-2 text-white">{selectedChats.length}</span>
                             </div>
 
                             <div className="flex items-center gap-2 text-sm font-bold">
@@ -315,9 +491,11 @@ const LiveChat = () => {
                                     <span ><i className="fa-solid fa-xmark mr-2"></i></span>
                                     Cancel
                                 </div>
-                                <div className="bg-gray-200 px-2 py-0.5 rounded-2xl text-gray-400 flex-items-2 gap-1 cursor-pointer">
+                                <div className={`px-2 py-0.5 rounded-2xl flex-items-2 gap-1 ${selectedChats.length > 0 ? "text-green-500 bg-green-200 cursor-pointer" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
+                                    onClick={()=> setOpenBulkUpdate(true)}
+                                    >
                                     <Image 
-                                    src="/Chat/merge-gray.png"
+                                    src={`${ selectedChats.length > 0 ? "/Chat/merge-green.png" : "/Chat/merge-gray.png" }`}
                                     alt="Merge icon"
                                     width={50}
                                     height={50}
@@ -347,6 +525,8 @@ const LiveChat = () => {
                                                     <input
                                                         id={chat.conversationId}
                                                         type="checkbox"
+                                                        checked={selectedChats.includes(chat.conversationId)}
+                                                        onChange={() => handleCheckboxToggle(chat.conversationId)}
                                                         className="inp-cbx absolute opacity-0"
                                                     />
                                                     <label htmlFor={chat.conversationId} className="cbx flex items-center cursor-pointer select-none">
@@ -418,11 +598,25 @@ const LiveChat = () => {
                             <div className="absolute bottom-0 w-full flex-items py-2 bg-gray-200">
                                 <p className="text-gray-500">Total Count: <span className="text-green-500 font-[600]">{selectedGroup.chats.length}</span></p>
                                 <div className="flex items-center gap-2">
-                                <i className="fa-solid fa-angles-left cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"></i>
-                                <i className="fa-solid fa-chevron-left cursor-pointer text-gray-600 hover:text-gray-500"></i>
-                                <p className="border-2 border-green-500 bg-green-200 px-2 py-0.5 text-green-600 rounded ">1</p>
-                                <i className="fa-solid fa-chevron-right cursor-pointer text-gray-600 hover:text-gray-500"></i>
-                                <i className="fa-solid fa-angles-right cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"></i>
+                                    <i
+                                    className="fa-solid fa-angles-left cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"
+                                    onClick={() => handleNavigateChat("first")}
+                                    ></i>
+                                    <i
+                                    className="fa-solid fa-chevron-left cursor-pointer text-gray-600 hover:text-gray-500"
+                                    onClick={() => handleNavigateChat("prev")}
+                                    ></i>
+                                    <p className="border-2 border-green-500 bg-green-200 px-2 py-0.5 text-green-600 rounded ">
+                                    {currentChatIndex + 1}
+                                    </p>
+                                    <i
+                                    className="fa-solid fa-chevron-right cursor-pointer text-gray-600 hover:text-gray-500"
+                                    onClick={() => handleNavigateChat("next")}
+                                    ></i>
+                                    <i
+                                    className="fa-solid fa-angles-right cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"
+                                    onClick={() => handleNavigateChat("last")}
+                                    ></i>
                                 </div>
                             </div>
                             );
@@ -442,7 +636,7 @@ const LiveChat = () => {
 
                     {/* RIGHT HEADER */}
                     {conversationMessages.length > 0 && (
-                        <div className="justify-items py-3 px-5 border-l border-l-gray-100 bg-white z-10 w-full h-16">
+                        <div className="relative justify-items py-3 px-5 border-l border-l-gray-100 bg-white z-10 w-full h-16 shadow-59">
                             {selectedChat && (
                             <div className="flex items-center gap-3 cursor-pointer" onClick={() => setOpenAddContacts(!openAddContacts)}>
                                 <Image 
@@ -487,7 +681,7 @@ const LiveChat = () => {
                                     </div>
                                 </div>
                                 {openAssignUser && (
-                                    <div ref={assignRef} className="absolute right-10 w-60 bg-white top-30 shadow-11 rounded overflow-y-auto pb-3">
+                                    <div ref={assignRef} className="absolute z-10 right-10 w-60 bg-white top-30 shadow-5 rounded overflow-y-auto pb-3">
                                         {filterAssigndata.length > 0 ? (
                                         filterAssigndata.map((opt, i) => (
                                         <div key={i} className="px-1">
@@ -511,7 +705,7 @@ const LiveChat = () => {
                                     </div>
                                 )}
 
-                                {selectedChat && selectedChat.status ? (
+                                {selectedChat && selectedChat.status === "new" ? (
                                     <div className="flex-items-2">
                                         <div className="border border-gray-300 hover:border-green-500 hover:shadow hover:shadow-green-200 hover:text-green-500 rounded-l p-[7px] px-2 text-gray-700 text-sm font-bold transition-all duration-300 cursor-pointer"
                                         onClick={handleUpdateStatus}
@@ -570,7 +764,7 @@ const LiveChat = () => {
                                             );
                                         } else if ((msg.sender === "System") || (msg.role === "system")) {
                                             return (
-                                                <div key={index} className="flex justify-center my-3">
+                                                <div key={index} className="flex justify-center pb-3">
                                                     <span className="bg-white text-gray-500 text-xs px-4 py-2 rounded shadow">
                                                         {msg.message}
                                                     </span>
@@ -590,7 +784,7 @@ const LiveChat = () => {
                                                                     <div className="flex-items-2 pl-3 hover:bg-gray-100 rounded cursor-pointer">
                                                                         <i className="fa-solid fa-reply"></i>
                                                                         <p 
-                                                                            onClick={() => setReplyTo(msg.message)}
+                                                                            onClick={() => setReplyTo(getReplyText(msg))}
                                                                             className="p-2">Reply</p>
                                                                     </div>
                                                                 </div>
@@ -634,7 +828,7 @@ const LiveChat = () => {
                                                                     <div className="flex-items-2 pl-3 hover:bg-gray-100 rounded cursor-pointer">
                                                                         <i className="fa-solid fa-reply"></i>
                                                                         <p 
-                                                                            onClick={() => setReplyTo(msg.message)}
+                                                                            onClick={() => setReplyTo(getReplyText(msg))}
                                                                             className="p-2">Reply</p>
                                                                     </div>
                                                                 </div>
@@ -661,7 +855,7 @@ const LiveChat = () => {
                                                                         <div
                                                                             key={i}
                                                                             onClick={(e) => e.stopPropagation()}
-                                                                            className="bg-[#dcf8c6] rounded-lg p-2 shadow-md max-w-[90%]"
+                                                                            className="bg-gray-300 rounded-lg p-2 shadow-md max-w-[90%]"
                                                                         >
                                                                             <img
                                                                             src={file.preview}
@@ -678,7 +872,7 @@ const LiveChat = () => {
                                                                         <div
                                                                             key={i}
                                                                             onClick={(e) => e.stopPropagation()}
-                                                                            className="bg-[#dcf8c6] rounded-lg p-2 shadow-md max-w-[90%]"
+                                                                            className="bg-gray-300 rounded-lg p-2 shadow-md max-w-[90%]"
                                                                         >
                                                                             <video
                                                                             controls
@@ -696,7 +890,7 @@ const LiveChat = () => {
                                                                         <div
                                                                             key={i}
                                                                             onClick={(e) => e.stopPropagation()}
-                                                                            className="bg-[#dcf8c6] rounded-lg p-2 shadow-md max-w-[90%] flex items-center"
+                                                                            className="bg-gray-300 rounded-lg p-2 shadow-md max-w-[90%] flex items-center"
                                                                         >
                                                                             <i className="fa-solid fa-headphones text-green-700 mr-2"></i>
                                                                             <audio
@@ -713,7 +907,7 @@ const LiveChat = () => {
                                                                     return (
                                                                         <div
                                                                         key={i}
-                                                                        className="bg-[#dcf8c6] rounded-lg p-3 shadow-md max-w-[90%] flex items-center gap-3"
+                                                                        className="bg-gray-300 rounded-lg p-3 shadow-md max-w-[90%] flex items-center gap-3"
                                                                         >
                                                                         {/* <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
                                                                             <i className="fa-solid fa-file-pdf text-red-600 text-lg"></i>
@@ -793,11 +987,11 @@ const LiveChat = () => {
                                                             <div className="absolute z-20 top-3 left-5 pt-3">
                                                                 <div className={`mt-1 text-xs p-0.5 bg-white rounded transition-all hidden duration-200 shadow ${replyTo === null ? "group-hover/arrow:block" : ""}`}>
                                                                     <div 
-                                                                        onClick={() => setReplyTo(msg.message)}
-                                                                        className="flex-items-2 hover:bg-gray-100 pl-3">
-                                                                        <i className="fa-solid fa-reply"></i>
-                                                                        <p className="p-2 rounded cursor-pointer">Reply</p>
-                                                                    </div>
+                                                                            onClick={() => setReplyTo(getReplyText(msg))}
+                                                                            className="flex-items-2 hover:bg-gray-100 pl-3">
+                                                                            <i className="fa-solid fa-reply"></i>
+                                                                            <p className="p-2 rounded cursor-pointer">Reply</p>
+                                                                        </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -834,7 +1028,7 @@ const LiveChat = () => {
                         </div>
                         )}
 
-                        {(selectedConversation && conversationMessages.length > 0 && !selectedChat.status) &&
+                        {(selectedConversation && conversationMessages.length > 0 && selectedChat.status === "closed") &&
                         <div className="bg-gray-50 gap-1 w-full text-xs flex-items-2 flex-col p-3 text-center">
                             <p>This chat has been resolved, so you can only send a message if the customer initiates a new chat</p>
                             <button className="border px-3 py-1 border-gray-400 hover:border-green-500 hover:text-green-500 rounded-2xl text-black gap-1 text-sm font-bold transition-all duration-150"
@@ -901,7 +1095,7 @@ const LiveChat = () => {
                                 </div>
                                 ) : selectedFile.file.type.startsWith("audio/") ? (
                                 // 🔊 Audio Preview
-                                <div className="flex flex-col items-center justify-center bg-gray-50 p-4 rounded-md">
+                                <div className="flex flex-col h-full items-center justify-center bg-gray-50 p-4 rounded-md">
                                     <audio
                                         controls
                                         className="w-[300px] max-w-md"
@@ -954,7 +1148,7 @@ const LiveChat = () => {
                                 </div>
                             )}
 
-                            {(selectedChat && selectedChat.status) && (
+                            {(selectedChat && selectedChat.status === "new") && (
                                 <ChatReplyBox 
                                 files={files} 
                                 setFiles={setFiles} 

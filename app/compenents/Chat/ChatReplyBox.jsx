@@ -323,11 +323,11 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
             </div>
           </div>
           <button
-          onClick={handleSend}
+          onClick={message !== "" || files.length !== 0 ? handleSend : null}
           className="transition-all cursor-none"
           >
             <i
-              className={`${message === "" ? "cursor-not-allowed text-gray-400" : "cursor-pointer text-transparent bg-gradient-to-r from-green-500 to-green-900 hover:scale-125 transition-all duration-150"} fa-solid fa-paper-plane text-[18px] rotate-45 bg-clip-text hover:from-green-400 hover:to-green-600`}
+              className={`${message !== "" || files.length !== 0 ? "cursor-pointer text-transparent bg-gradient-to-r from-green-500 to-green-900 hover:scale-125 transition-all duration-150" : "cursor-not-allowed text-gray-400"} fa-solid fa-paper-plane text-[18px] rotate-45 bg-clip-text hover:from-green-400 hover:to-green-600`}
             ></i>
           </button>
         </div>

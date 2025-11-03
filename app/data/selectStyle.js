@@ -38,4 +38,12 @@ export const customStyles = {
     padding: '10px 12px',
     cursor: 'pointer',
   }),
+  groupHeading: (base) => ({
+    ...base,
+    fontSize: "12px",
+    color: "#8a8a8a",
+    fontWeight: "600",
+    padding: "2px 12px",
+    textTransform: "none",
+  }),
 };

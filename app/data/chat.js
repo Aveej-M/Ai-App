@@ -258,7 +258,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: false
+        status: "closed"
       },
       {
         conversationId: "bot-chat-002",
@@ -298,7 +298,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: true
+        status: "new"
       },
       {
         conversationId: "bot-chat-003",
@@ -368,7 +368,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: false
+        status: "closed"
       },
       {
         conversationId: "bot-chat-004",
@@ -408,7 +408,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: true
+        status: "new"
       },
       {
         conversationId: "bot-chat-00 5",
@@ -478,7 +478,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: false
+        status: "closed"
       },
       {
         conversationId: "bot-chat-006",
@@ -518,7 +518,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: true
+        status: "new"
       },
       {
         conversationId: "bot-chat-007",
@@ -588,7 +588,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: false
+        status: "closed"
       },
       {
         conversationId: "bot-chat-008",
@@ -628,7 +628,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: true
+        status: "new"
       },
     ],
     bookMark: true,
@@ -651,4 +651,29 @@ export const aiChatData = [
   { label: "Align with Brand Voice", value: "align_with_brand_voice" },
   { label: "Remove Jargon", value: "remove_jargon" },
 ];
+
+export const bulkUpdateData = [
+    { label: "Assign to", value: "assign_to" },
+    { label: "Update Conversation Status", value: "update_convo_status" },
+];
+
+export const assigntoData = [
+    { label: "Assign to User", options: [
+      { value: "pradeep", label: "Pradeep Chandran", type: "user" },
+    ], },
+    { label: "Assign to Bot", options: [
+        { value: "bot-1", label: "Bot", type: "bot" },
+        ], },
+    { label: "Assign to AI Agent", options: [
+      { value: "agent-spark", label: "Agent Spark", type: "ai" },
+    ], },
+];
+
+export const conversationStatusData = [
+  { label: "Closed", value: "closed" },
+  { label: "New", value: "new" },
+  { label: "On Hold", value: "on_hold" },
+  { label: "Waiting on customer", value: "waiting_customer" },
+  { label: "Waiting on us", value: "waiting_us" }
+]
 

@@ -11,11 +11,13 @@ const FilterTab = ({ setOpenFilterTab}) => {
     const [sourceChat, setSourceChat] = useState("all");
     const [statusConverstion, setStatusConversation] = useState("")
     const [openAiChatbot, setOpenAiChatbot] = useState(false);
+    const [openChatBot, setOpenChatBot] = useState(false);
     const [openTeam, setOpenTeam] = useState(false);
     const [openWeb, setOpenWeb] = useState(false);
     const [openWhatsapp, setOpenWhatsapp] = useState(false);
 
     const filterRef = useRef();
+    const dropRef = useRef();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -26,6 +28,15 @@ const FilterTab = ({ setOpenFilterTab}) => {
                     setOpenFilterTab(false);
                 }, 400);
             };
+
+      const clickedOnTrigger = typeof event.target.closest === 'function' && event.target.closest('.dropdown-trigger');
+      if (dropRef.current && !dropRef.current.contains(event.target) && !clickedOnTrigger) {
+              setOpenWeb(false);
+              setOpenWhatsapp(false);
+              setOpenTeam(false);
+              setOpenAiChatbot(false);
+              setOpenChatBot(false);
+            }
         }
 
         document.addEventListener("mousedown", handleClickOutside);
@@ -69,7 +80,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
           </div>
 
           {/* Content Area */}
-          <div className="p-5 relative flex flex-col items-center gap-3 transform-3d">
+          <div className="p-5 relative flex flex-col items-center gap-3 transform-3d overflow-y-auto h-[80dvh]">
             <div className="flex flex-col w-full items-start gap-3">
               <div htmlFor="chat-manager" className="flex-items">
                   <i className="fa-regular fa-paper-plane rotate-50 text-green-500"></i>
@@ -107,7 +118,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                       <i className="fa-solid fa-xmark text-xs text-red-500 hover:bg-white rounded-2xl px-0.5"></i>
                     </div>
                     <input type="text" 
-                    className="min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]" 
+                    className="dropdown-trigger min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px] w-full" 
                     placeholder="Select Ai Chatbot"
                     onClick={()=> setOpenAiChatbot(!openAiChatbot)}
                     // onFocus={() => setOpenAiChatbot(true)}
@@ -115,7 +126,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                     />
                   </div>
                   {openAiChatbot && (
-                    <div className="flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
+                    <div ref={dropRef} className="flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
                         {/* <p>No Data Found</p> */}
                         <p className="px-5 py-2 hover:bg-gray-200 w-full rounded cursor-pointer">Agent Spark</p>
                     </div>
@@ -135,15 +146,15 @@ const FilterTab = ({ setOpenFilterTab}) => {
                       <i className="fa-solid fa-xmark text-xs text-red-500 hover:bg-white rounded-2xl p-0.5"></i>
                     </div> */}
                   <input type="text" 
-                  className="min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]" 
-                  placeholder="Select Ai Chatbot"
-                  onClick={()=> setOpenAiChatbot(!openAiChatbot)}
+                  className="dropdown-trigger min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px] w-full" 
+                  placeholder="Select Chatbot"
+                  onClick={()=> setOpenChatbot(!openChatBot)}
                   // onFocus={() => setOpenAiChatbot(true)}
                   // onBlur={() => setOpenAiChatbot(false)}
                   />
                   </div>
-                  {openAiChatbot && (
-                    <div className="absolute -bottom-17 bg-white flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
+                  {openChatBot && (
+                    <div ref={dropRef} className="absolute -bottom-17 bg-white flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
                         <p className="w-full text-center">No Data Found</p>
                         {/* <p className="px-5 py-2 hover:bg-gray-200 w-full rounded cursor-pointer">Agent Spark</p> */}
                     </div>
@@ -163,7 +174,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                       <i className="fa-solid fa-xmark text-xs text-red-500 hover:bg-white rounded-2xl p-0.5"></i>
                     </div> */}
                   <input type="text" 
-                  className="min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]" 
+                  className="dropdown-trigger min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px] w-full" 
                   placeholder="Please Add/Search here..."
                   onClick={()=> setOpenTeam(!openTeam)}
                   // onFocus={() => setOpenAiChatbot(true)}
@@ -213,7 +224,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                       <i className="fa-solid fa-xmark text-xs text-red-500 hover:bg-white rounded-2xl p-0.5"></i>
                     </div> */}
                   <input type="text" 
-                  className="min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]" 
+                  className="dropdown-trigger min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px] w-full" 
                   placeholder="Choose Channels"
                   onClick={()=> setOpenWeb(!openWeb)}
                   // onFocus={() => setOpenAiChatbot(true)}
@@ -221,7 +232,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   />
                   </div>
                   {openWeb && (
-                    <div className="absolute -bottom-17 bg-white flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
+                    <div ref={dropRef} className="absolute -bottom-17 bg-white flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
                         <p className="w-full text-center">No Data Found</p>
                         {/* <p className="px-5 py-2 hover:bg-gray-200 w-full rounded cursor-pointer">Agent Spark</p> */}
                     </div>
@@ -241,7 +252,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                       <i className="fa-solid fa-xmark text-xs text-red-500 hover:bg-white rounded-2xl p-0.5"></i>
                     </div> */}
                   <input type="text" 
-                  className="min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px]" 
+                  className="dropdown-trigger min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px] w-full" 
                   placeholder="Choose Channels"
                   onClick={()=> setOpenWhatsapp(!openWhatsapp)}
                   // onFocus={() => setOpenAiChatbot(true)}
@@ -249,7 +260,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   />
                   </div>
                   {openWhatsapp && (
-                    <div className="absolute -bottom-17 bg-white flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
+                    <div ref={dropRef} className="absolute -bottom-17 bg-white flex p-2 items-center text-gray-400 w-full min-h-15 border border-gray-400 rounded shadow">
                         <p className="w-full text-center">No Data Found</p>
                         {/* <p className="px-5 py-2 hover:bg-gray-200 w-full rounded cursor-pointer">Agent Spark</p> */}
                     </div>
@@ -273,6 +284,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   placeholder="Select Bot"
                   styles={customStyles}
                   className="w-full text-sm"
+                  menuPlacement="top"
                   components={{
                   IndicatorSeparator: () => null
                   }}
