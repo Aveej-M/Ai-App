@@ -54,8 +54,8 @@ const Header = ({ setOpenProfile }) => {
           <span>Available</span>
           <Image src="/Header/drop.png"
             alt="expand arrow"
-            width={15} height={20}
-            className="w-[15px]"
+            width={15} height={15}
+            className="w-auto"
           />
         </div>
 
@@ -129,7 +129,8 @@ const Header = ({ setOpenProfile }) => {
           <span>Winfomi</span>
           <Image src="/Header/drop.png"
             alt="check icon"
-            width={15} height={20}
+            width={15} height={15}
+            className="w-auto"
           />
         </div>
         <div onClick={() => setOpenProfile(true)} className="cursor-pointer">
@@ -137,6 +138,7 @@ const Header = ({ setOpenProfile }) => {
           <Image src="/Header/Profile.png"
             alt="check icon"
             width={30} height={20}
+            className="w-auto"
           />
           {/* </Link> */}
 

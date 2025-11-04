@@ -258,7 +258,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: "closed"
+        status: "closed",
+        isRead: false,
       },
       {
         conversationId: "bot-chat-002",
@@ -298,7 +299,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: "new"
+        status: "new",
+        isRead: false,
       },
       {
         conversationId: "bot-chat-003",
@@ -368,7 +370,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: "closed"
+        status: "closed",
+        isRead: false,
       },
       {
         conversationId: "bot-chat-004",
@@ -408,7 +411,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: "new"
+        status: "new",
+        isRead: true,
       },
       {
         conversationId: "bot-chat-00 5",
@@ -478,7 +482,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: "closed"
+        status: "closed",
+        isRead: true,
       },
       {
         conversationId: "bot-chat-006",
@@ -518,7 +523,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: "new"
+        status: "new",
+        isRead: true,
       },
       {
         conversationId: "bot-chat-007",
@@ -588,7 +594,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        status: "closed"
+        status: "closed",
+        isRead: true,
       },
       {
         conversationId: "bot-chat-008",
@@ -628,7 +635,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        status: "new"
+        status: "new",
+        isRead: true,
       },
     ],
     bookMark: true,

@@ -673,7 +673,7 @@ h6.ce-header {
 
   /* checked state */
   .checkbox-wrapper-46 .inp-cbx:checked + .cbx span:first-child {
-    @apply bg-green-500 border-[#506EEC];
+    @apply bg-green-600 border-[#506EEC];
     animation: wave-46 0.4s ease;
   }
 
