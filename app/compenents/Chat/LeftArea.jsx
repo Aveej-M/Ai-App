@@ -1,11 +1,50 @@
 "use client"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
-const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, openMerge, chatMessages, selectedChat,truncateText, currentChatIndex, handelSelectConversationMsg, setBookMark, setOpenMerge, selectedChats, setOpenSearchTab, handleNavigateChat, isSelectAll, handleSelectAllToggle, handleCheckboxToggle, setOpenBulkUpdate, setOpenConversationTab,setOpenFilterTab, forceVisibleChatId }) => {
+const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, openMerge, chatMessages,selectedChat,truncateText, currentChatIndex, handelSelectConversationMsg, setBookMark, setOpenMerge, selectedChats, setOpenSearchTab, handleNavigateChat, isSelectAll, handleSelectAllToggle, handleCheckboxToggle, setOpenBulkUpdate, setOpenConversationTab,setOpenFilterTab, sourceChat, manageChat, statusConversation, filterCount }) => {
 
     const [filterType, setFilterType] = useState('all');
+    const [searchInput, setSearchInput] = useState("");
+    // derive the currently selected group and visible (filtered + searched) chats
+    const selectedGroup = chatMessages.find((g) => g.name === selectedConversation);
 
+    const visibleChats = selectedGroup
+        ? selectedGroup.chats
+              .filter((chat) => (filterType === "unread" ? !chat.isRead : true))
+              .filter((item) =>
+                  item.user.toLowerCase().includes(searchInput.toLowerCase()) &&
+                  (statusConversation === "" || item.status === statusConversation) &&
+                  (sourceChat === "all" || item.source === sourceChat) &&
+                  (manageChat === "all" || item.managed_by === manageChat)
+              )
+        : [];
+
+    const currentVisiblePos = selectedChat ? visibleChats.findIndex((c) => c.conversationId === selectedChat.conversationId) : -1;
+
+    // navigate within the filtered/visible chats and call parent handler with original index
+    const navigateFiltered = (direction) => {
+        if (!selectedGroup || visibleChats.length === 0) return;
+
+        const currentConvId = selectedChat?.conversationId;
+        let visIdx = visibleChats.findIndex((c) => c.conversationId === currentConvId);
+        if (visIdx === -1) visIdx = 0; // if current isn't visible, default to first
+
+        let targetVisIdx = visIdx;
+        if (direction === "first") targetVisIdx = 0;
+        else if (direction === "last") targetVisIdx = visibleChats.length - 1;
+        else if (direction === "next") targetVisIdx = Math.min(visIdx + 1, visibleChats.length - 1);
+        else if (direction === "prev") targetVisIdx = Math.max(visIdx - 1, 0);
+
+        const targetConv = visibleChats[targetVisIdx];
+        if (!targetConv) return;
+
+        const originalIdx = selectedGroup.chats.findIndex((c) => c.conversationId === targetConv.conversationId);
+        if (originalIdx !== -1) {
+            handelSelectConversationMsg(targetConv.conversationId, originalIdx);
+        }
+    };
+    
   return (
     <div className='w-[30%] h-screen -top-15 pt-15 pb-12 bg-gray-50 relative flex flex-col'>
         <div>
@@ -44,6 +83,8 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                                     <label className="text-sm font-bold">Search User</label>
                                     <input type="text" 
                                     placeholder="Search User"
+                                    value={searchInput}
+                                    onChange={(e)=> setSearchInput(e.target.value)}
                                     className="topic-formInput mt-0! h-8 text-sm"
                                     />
                                 </div>
@@ -64,6 +105,8 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                     onClick={() => setOpenFilterTab(true)}
                     className='relative group rounded-2xl'>
                         <i className="fa-solid fa-sliders hover:bg-green-200 px-2 py-2 rounded-2xl transition-all duration-300 cursor-pointer"></i>
+                        {filterCount > 0 && (
+                        <span className="absolute flex-items -top-1 left-0 text-xs bg-green-500 h-4 w-4 text-white rounded-full">{filterCount}</span>)}
                         <span className='absolute -top-10 -left-1.5 z-30 w-fit px-2 py-1 hidden group-hover:block bg-black/80 text-white rounded text-sm text-center'>Filter</span>
                         <div className="absolute -top-3 left-3 z-30 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-black/80 hidden group-hover:block" />
                     </div>
@@ -71,9 +114,9 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
             </div>
             <div className='flex gap-2 px-5 pb-3 text-xs text-gray-500'>
                 <div onClick={()=> setFilterType("all")}
-                className={`${filterType === "all" ? "bg-green-400 hover:bg-green-500 hover:text-white" : "bg-gray-200 hover:bg-gray-300"} px-4 py-1 rounded-2xl cursor-pointer transition-all duration-150`}>All</div>
+                className={`${filterType === "all" ? "bg-green-400 hover:bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300"} px-4 py-1 rounded-2xl cursor-pointer transition-all duration-150`}>All</div>
                 <div onClick={()=> setFilterType("unread")}
-                className={`${filterType === "unread" ? "bg-green-400 hover:bg-green-500 hover:text-white" : "bg-gray-200 hover:bg-gray-300"} px-4 py-1   rounded-2xl cursor-pointer transition-all duration-150`}>Unread</div>
+                className={`${filterType === "unread" ? "bg-green-400 hover:bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300"} px-4 py-1   rounded-2xl cursor-pointer transition-all duration-150`}>Unread</div>
             </div>
         </div>
 
@@ -136,15 +179,21 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                         if (filterType === "unread") return !chat.isRead;
                         return true;
                     });
-                    
                     return (
                         <div key={idx}>
-                        {filteredChats.length > 0 ? (
-                            filteredChats.map((chat, msgIdx) => (
+                        {visibleChats.length > 0 ? (
+                        //     filteredChats.filter(item => item.user.toLowerCase().includes(searchInput.toLowerCase())
+                        // && ( statusConversation === "" || item.status === statusConversation)
+                        // && (sourceChat === "all" || item.source === sourceChat))
+                            visibleChats.map((chat, msgIdx) => (
                             <div
                             key={chat.conversationId}
                             className={`border-b border-b-gray-400 hover:bg-gray-100 justify-items py-3 px-6 cursor-pointer ${selectedChat && selectedChat.conversationId === chat.conversationId ? 'bg-gray-200 hover:bg-gray-200' : ''}`}
-                            onClick={!openMerge ? ()=> handelSelectConversationMsg(chat.conversationId, msgIdx) : undefined}
+                            onClick={!openMerge ? () => {
+                                const originalIdx = conversationGroup.chats.findIndex(c => c.conversationId === chat.conversationId);
+                                // fallback to msgIdx if not found (shouldn't happen but guard just in case)
+                                handelSelectConversationMsg(chat.conversationId, originalIdx !== -1 ? originalIdx : msgIdx);
+                            } : undefined}
                             >
                                 <div className="flex-items">
                                     {openMerge && (
@@ -221,26 +270,26 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                 if (selectedGroup && selectedGroup.chats.length > 0) {
                     return (
                     <div className="absolute bottom-0 w-full flex-items py-2 bg-gray-200">
-                        <p className="text-gray-500">Total Count: <span className="text-green-500 font-[600]">{selectedGroup.chats.length}</span></p>
+                        <p className="text-gray-500">Total Count: <span className="text-green-500 font-[600]">{visibleChats.length}</span></p>
                         <div className="flex items-center gap-2">
                             <i
                             className="fa-solid fa-angles-left cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"
-                            onClick={() => handleNavigateChat("first")}
+                            onClick={() => navigateFiltered("first")}
                             ></i>
                             <i
                             className="fa-solid fa-chevron-left cursor-pointer text-gray-600 hover:text-gray-500"
-                            onClick={() => handleNavigateChat("prev")}
+                            onClick={() => navigateFiltered("prev")}
                             ></i>
-                            <p className="border-2 border-green-500 bg-green-200 px-2 py-0.5 text-green-600 rounded ">
-                            {currentChatIndex + 1}
-                            </p>
+                                                        <p className="border-2 border-green-500 bg-green-200 px-2 py-0.5 text-green-600 rounded ">
+                                                        {visibleChats.length > 0 ? (currentVisiblePos !== -1 ? currentVisiblePos + 1 : 0) : currentChatIndex + 1}
+                                                        </p>
                             <i
                             className="fa-solid fa-chevron-right cursor-pointer text-gray-600 hover:text-gray-500"
-                            onClick={() => handleNavigateChat("next")}
+                            onClick={() => navigateFiltered("next")}
                             ></i>
                             <i
                             className="fa-solid fa-angles-right cursor-pointer text-xs text-gray-500 hover:text-gray-400 transition-all duration-200"
-                            onClick={() => handleNavigateChat("last")}
+                            onClick={() => navigateFiltered("last")}
                             ></i>
                         </div>
                     </div>

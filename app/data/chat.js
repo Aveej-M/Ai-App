@@ -184,7 +184,81 @@ export const chatMessages = [
   },
   { 
     name: "All Resolved Chats", 
-    chats: [],
+    chats: [
+      {
+        conversationId: "bot-chat-001",
+        user: "Guest user 1",
+        channel: "Web",
+        startDate: "19/08/2025",
+        endDate: "27/08/2025",
+        messages: [
+          {
+            sender: "System",
+            role: "date",
+            message: "19/08/2025",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "How r u",
+            timestamp: "2025-08-19T09:59:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hello there! I'm doing well, thank you for asking. How can I help you today?",
+            timestamp: "2025-08-19T10:00:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "hi",
+            timestamp: "2025-08-19T10:01:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "Hi there! Is there anything I can help you with today?",
+            timestamp: "2025-08-19T10:02:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:06:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from Closed to New by System",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Guest user",
+            role: "customer",
+            message: "You are exceeding your allocated Casual Leave balance. Your casual leave balance is 0.00. You are exceeding your allocated Casual Leave balance. Your casual leave balance is 0.00",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "Agent Spark",
+            role: "agent",
+            message: "I don't have the specific details on how to get your analytics data right now. That's something I'd need to check on. Is there anything else I can help you with today?",
+            timestamp: "2025-08-19T10:23:00Z"
+          },
+          {
+            sender: "System",
+            role: "system",
+            message: "Conversation status changed from New to Closed by the System",
+            timestamp: "2025-08-19T10:30:00Z"
+          }
+        ],
+        managed_by: "Team",
+        source: "web",
+        status: "closed",
+        isRead: false,
+      },
+    ],
     bookMark: false, 
   },
   { 
@@ -258,6 +332,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
+        managed_by: "team",
+        source: "web",
         status: "closed",
         isRead: false,
       },
@@ -299,6 +375,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
+        managed_by: "team",
+        source: "web",
         status: "new",
         isRead: false,
       },
@@ -370,6 +448,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
+        managed_by: "team",
+        source: "whatsapp",
         status: "closed",
         isRead: false,
       },
@@ -411,6 +491,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
+        managed_by: "team",
+        source: "web",
         status: "new",
         isRead: true,
       },
@@ -482,6 +564,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
+        managed_by: "team",
+        source: "web",
         status: "closed",
         isRead: true,
       },
@@ -523,6 +607,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
+        managed_by: "ai-chat",
+        source: "web",
         status: "new",
         isRead: true,
       },
@@ -594,6 +680,8 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
+        managed_by: "team",
+        source: "web",
         status: "closed",
         isRead: true,
       },
@@ -635,6 +723,8 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
+        managed_by: "ai-chat",
+        source: "web",
         status: "new",
         isRead: true,
       },

@@ -5,59 +5,80 @@ import { customStyles } from "../../data/selectStyle";
 import Image from "next/image";
 import { chatManage, chatSource, converstaionStatus } from "../../data/chat";
 
-const FilterTab = ({ setOpenFilterTab}) => {
+const FilterTab = ({ setOpenFilterTab, statusConversation, setStatusConversation, filterCount, setFilterCount, sourceChat, setSourceChat, manageChat, setManageChat, filterApplied, setFilterApplied }) => {
     const [isClosing, setIsClosing] = useState(false);
-    const [manageChat, setManageChat] = useState("all");
-    const [sourceChat, setSourceChat] = useState("all");
-    const [statusConverstion, setStatusConversation] = useState("")
     const [openAiChatbot, setOpenAiChatbot] = useState(false);
     const [openChatBot, setOpenChatBot] = useState(false);
     const [openTeam, setOpenTeam] = useState(false);
     const [openWeb, setOpenWeb] = useState(false);
     const [openWhatsapp, setOpenWhatsapp] = useState(false);
 
+    const [tempManageChat, setTempManageChat] = useState(manageChat);
+    const [tempSourceChat, setTempSourceChat] = useState(sourceChat);
+    const [tempStatusConversation, setTempStausConversation] = useState(statusConversation);
+    const [selectKey, setSelectKey] = useState(0);
+
     const filterRef = useRef();
     const dropRef = useRef();
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (filterRef.current && !filterRef.current.contains(event.target)) {
-                setIsClosing(true);
+      const handleClickOutside = (event) => {
+        if (filterRef.current && !filterRef.current.contains(event.target)) {
+            setIsClosing(true);
 
-                setTimeout(() => {
-                    setOpenFilterTab(false);
-                }, 400);
-            };
-
-      const clickedOnTrigger = typeof event.target.closest === 'function' && event.target.closest('.dropdown-trigger');
-      if (dropRef.current && !dropRef.current.contains(event.target) && !clickedOnTrigger) {
-              setOpenWeb(false);
-              setOpenWhatsapp(false);
-              setOpenTeam(false);
-              setOpenAiChatbot(false);
-              setOpenChatBot(false);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
+            setTimeout(() => {
+                setOpenFilterTab(false);
+            }, 400);
         };
+
+        const clickedOnTrigger = typeof event.target.closest === 'function' && event.target.closest('.dropdown-trigger');
+        if (dropRef.current && !dropRef.current.contains(event.target) && !clickedOnTrigger) {
+          setOpenWeb(false);
+          setOpenWhatsapp(false);
+          setOpenTeam(false);
+          setOpenAiChatbot(false);
+          setOpenChatBot(false);
+        }
+      }
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+      };
     }, [setOpenFilterTab]);
 
     const handleClose = () => {
-    // trigger slide-out animation
-    setIsClosing(true);
-    // wait for animation to finish before unmounting
-    setTimeout(() => {
-      setOpenFilterTab(false);
-    }, 400); // match animation duration
+      // trigger slide-out animation
+      setIsClosing(true);
+      // wait for animation to finish before unmounting
+      setTimeout(() => {
+        setOpenFilterTab(false);
+      }, 400); // match animation duration
     };
 
     const handleResetFilter = () => {
+      setTempManageChat("all");
+      setTempSourceChat("all");
+      setTempStausConversation("");
+
       setManageChat('all');
       setSourceChat('all');
       setStatusConversation("");
+
+      setFilterCount(0);
+      setFilterApplied({
+        status: false,
+        source: false,
+        manager: false
+      })
+      setSelectKey(prev => prev + 1);
+    }
+
+    const handleApply = () => {
+      setManageChat(tempManageChat);
+      setStatusConversation(tempStatusConversation);
+      setSourceChat(tempSourceChat);
+      setOpenFilterTab(false);
     }
 
   return (
@@ -89,8 +110,12 @@ const FilterTab = ({ setOpenFilterTab}) => {
               <Select 
                   instanceId="chat-manager"
                   options={chatManage}
-                  value={chatManage.find(option => option.value === manageChat)}
-                  onChange={(e)=> setManageChat(e.value)}
+                  value={chatManage.find(option => option.value === tempManageChat)}
+                  onChange={(e)=> {setTempManageChat(e.value);
+                    if (e.value !== "" && !filterApplied.manager) {
+                    setFilterCount(filterCount + 1);
+                    setFilterApplied(prev => ({ ...prev, manager: true }))
+                  }}}
                   styles={customStyles}
                   className="w-full text-sm"
                   components={{
@@ -99,7 +124,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
               />
             </div>
 
-            {manageChat === "ai-chat" ? (
+            {tempManageChat === "ai-chat" ? (
               <div className="flex flex-col w-full items-start gap-3 mt-2">
                 <div className="flex-items">
                     <Image 
@@ -133,7 +158,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   )}
                 </div>
             </div>
-            ) : (manageChat === "bot") ? (
+            ) : (tempManageChat === "bot") ? (
               <div className="flex flex-col w-full items-start gap-3 mt-2">
                 <div className="flex-items">
                     <i className="fa-solid fa-robot text-green-500"></i>
@@ -148,7 +173,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   <input type="text" 
                   className="dropdown-trigger min-h-10 font-light flex-1 outline-none border-none text-sm py-1 px-1 min-w-[100px] w-full" 
                   placeholder="Select Chatbot"
-                  onClick={()=> setOpenChatbot(!openChatBot)}
+                  onClick={()=> setOpenChatBot(!openChatBot)}
                   // onFocus={() => setOpenAiChatbot(true)}
                   // onBlur={() => setOpenAiChatbot(false)}
                   />
@@ -161,7 +186,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   )}
                 </div>
             </div>
-            ) : (manageChat === "team") && (
+            ) : (tempManageChat === "team") && (
               <div className="flex flex-col w-full items-start gap-3 mt-2">
                 <div className="flex-items">
                     <i className="fa-solid fa-user-group text-green-500"></i>
@@ -201,8 +226,13 @@ const FilterTab = ({ setOpenFilterTab}) => {
               <Select 
                   instanceId="chat-manager"
                   options={chatSource}
-                  value={chatSource.find(option => option.value === sourceChat)}
-                  onChange={(e)=> setSourceChat(e.value)}
+                  value={chatSource.find(option => option.value === tempSourceChat)}
+                  onChange={(e)=> {setTempSourceChat(e.value);
+                    if (e.value !== "" && !filterApplied.source) {
+                      setFilterCount(filterCount + 1);
+                      setFilterApplied(prev => ({ ...prev, source: true }))
+                    }
+                  }}
                   styles={customStyles}
                   className="w-full text-sm"
                   components={{
@@ -211,7 +241,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
               />
             </div>
 
-            {sourceChat === "web" ? (
+            {tempSourceChat === "web" ? (
               <div className="flex flex-col w-full items-start gap-3 mt-2">
                 <div className="flex-items">
                     <i className="fa-solid fa-tower-cell text-green-500"></i>
@@ -239,7 +269,7 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   )}
                 </div>
             </div>
-            ) : (sourceChat === "whatsapp") && (
+            ) : (tempSourceChat === "whatsapp") && (
               <div className="flex flex-col w-full items-start gap-3 mt-2">
                 <div className="flex-items">
                     <i className="fa-solid fa-tower-cell text-green-500"></i>
@@ -277,10 +307,15 @@ const FilterTab = ({ setOpenFilterTab}) => {
                   <h2 className="font-bold text-gray-700">Conversation Status</h2>
               </div>
               <Select 
+                  key={selectKey}
                   instanceId="chat-manager"
                   options={converstaionStatus}
-                  value={converstaionStatus.find(option => option.value === statusConverstion)}
-                  onChange={(e)=> setStatusConversation(e.value)}
+                  value={converstaionStatus.find(option => option.value === tempStatusConversation)}
+                  onChange={(e)=> {setTempStausConversation(e.value); 
+                    if (e.value !== "" && !filterApplied.status) {
+                      setFilterCount(filterCount + 1)
+                      setFilterApplied(prev => ({...prev, status: true}))
+                    }}}
                   placeholder="Select Bot"
                   styles={customStyles}
                   className="w-full text-sm"
@@ -293,14 +328,15 @@ const FilterTab = ({ setOpenFilterTab}) => {
           </div>
         </div>
 
-        <div className="flex gap-3 justify-end border-t p-5 border-gray-300">
+        <div className="flex gap-3 justify-end border-t p-5 border-gray-300 bg-gray-200">
           <button 
           onClick={handleClose}
-          className="border border-gray-400 px-5 py-2 text-sm text-gray-700 hover:border-green-400 hover:text-green-500 hover:bg-green-100 rounded-[20px] transition-all duration-300">Cancel</button>
+          className="border border-gray-400 bg-white px-5 py-2 text-sm text-gray-700 hover:border-green-400 hover:text-green-500 hover:bg-green-100 rounded-[20px] transition-all duration-300">Cancel</button>
           <button 
           onClick={handleResetFilter}
-          className="border border-gray-400 px-5 py-2 text-sm text-gray-700 hover:border-green-400 hover:text-green-500 hover:bg-green-100 rounded-[20px] transition-all duration-300">Reset</button>
-          <button className="border border-green-400 px-5 py-2 text-sm text-white bg-green-500 hover:border-green-400 hover:bg-green-600 rounded-[20px] transition-all duration-300">Apply</button>
+          className="relative border border-gray-400 bg-white px-5 py-2 text-sm text-gray-700 hover:border-green-400 hover:text-green-500 hover:bg-green-100 rounded-[20px]">Reset Filter</button>
+          <button onClick={handleApply}
+          className="border border-green-400 px-5 py-2 text-sm text-white bg-green-500 hover:border-green-400 hover:bg-green-600 rounded-[20px] transition-all duration-300">Apply</button>
         </div>
       </div>
     </div>

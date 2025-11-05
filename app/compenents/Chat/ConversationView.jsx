@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { conversationData, chatMessages } from "../../data/chat";
 
-const ConversationView = ({ setOpenConversationTab, onSelectConversation, selectedConversation }) => {
+const ConversationView = ({ setOpenConversationTab, onSelectConversation, selectedConversation, chatMessages }) => {
   const [conversationList, setConversationList] = useState(chatMessages);
   const [isClosing, setIsClosing] = useState(false);
   const [searchInput, setSearchInput] = useState("");
