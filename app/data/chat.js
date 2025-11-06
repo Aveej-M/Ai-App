@@ -126,7 +126,7 @@ export const lifeCycleData = [
 
 export const assignOptions = [
     { category: "Assign to Team - This will move a conversation to unassigned status", value: "Team" },
-    { category: "Assign to User", value: "Pradeep Chandran" },
+    { category: "Assign to User", value: "Jeeva" },
     { category: "Assign to AI Agent", value: "Agent Spark" },
     { category: "Assign to Web Bot", value: "Default Live Chat" },
   ];
@@ -253,7 +253,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        managed_by: "Team",
+        managed_by: {type: "team", name: "Team"},
         source: "web",
         status: "closed",
         isRead: false,
@@ -332,7 +332,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        managed_by: "team",
+        managed_by: {type: "agent", name: "Agent Spark"},
         source: "web",
         status: "closed",
         isRead: false,
@@ -375,7 +375,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        managed_by: "team",
+        managed_by: {type: "admin", name: "Jeeva"},
         source: "web",
         status: "new",
         isRead: false,
@@ -448,7 +448,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        managed_by: "team",
+        managed_by: {type: "admin", name: "Jeeva"},
         source: "whatsapp",
         status: "closed",
         isRead: false,
@@ -491,7 +491,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        managed_by: "team",
+        managed_by: {type: "team", name: "Team"},
         source: "web",
         status: "new",
         isRead: true,
@@ -564,7 +564,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        managed_by: "team",
+        managed_by: {type: "team", name: "Team"},
         source: "web",
         status: "closed",
         isRead: true,
@@ -607,7 +607,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        managed_by: "ai-chat",
+        managed_by: {type: "agent", name: "Agent Spark"},
         source: "web",
         status: "new",
         isRead: true,
@@ -680,7 +680,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        managed_by: "team",
+        managed_by: {type: "agent", name: "Agent Spark"},
         source: "web",
         status: "closed",
         isRead: true,

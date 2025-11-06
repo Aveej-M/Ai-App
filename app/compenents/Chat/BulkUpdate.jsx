@@ -4,9 +4,9 @@ import Select from "react-select";
 import { customStyles } from "../../data/selectStyle";
 import { bulkUpdateData, assigntoData, conversationStatusData } from "../../data/chat";
 
-const BulkUpdate = ({ setOpneBulkUpdate, selectedIds = [], onUpdate }) => {
+const BulkUpdate = ({ setOpneBulkUpdate, selectedIds = [], onUpdate, handleUpdateStatus }) => {
     const [animateOut, setAnimateOut] = useState(false);
-    const [searchInput, setSearchInput] = useState("");
+    // const [searchInput, setSearchInput] = useState("");
     const [updateData, setUpdateData] = useState("");
     const [assignTo, setAssignTo] = useState("");
     const [convoStatus, setConvoStatus] = useState("");

@@ -120,7 +120,7 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
             </div>
         </div>
 
-        <div className="flex flex-1 h-full overflow-y-auto flex-col justify-between">
+        <div className="flex flex-1 h-full overflow-y-auto flex-col">
             {openMerge && (
                 <div className="justify-items px-5 mb-2">
                     <div className="flex-items-2 gap-2 text-sm"> 
