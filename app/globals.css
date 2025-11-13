@@ -644,6 +644,33 @@ h6.ce-header {
   animation: slideOutX 0.4s ease-in-out forwards;
 }
 
+@keyframes slideInY {
+  from {
+    transform: translateY(100%) scaleY(0.8);
+    opacity: 0;
+  } to {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutY {
+  from {
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  } to {
+    transform: translateY(100%) scaleY(0.8);
+    opacity: 0;
+  }
+}
+
+.slide-in-y {
+  animation: slideInY 0.4s ease-in-out forwards;
+}
+.slide-out-y {
+  animation: slideOutY 0.4s ease-in-out forwards;
+}
+
 /* Chat AI Animation */
 
 .dropdown {

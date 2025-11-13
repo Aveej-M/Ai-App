@@ -157,7 +157,7 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                             Cancel
                         </div>
                         <div className={`px-2 py-0.5 w-22 rounded-2xl flex-items-2 gap-1 ${selectedChats.length > 0 ? "text-green-500 bg-green-200 cursor-pointer" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
-                            onClick={()=> setOpenBulkUpdate(true)}
+                            onClick={()=> (selectedChats.length > 0 && (setOpenBulkUpdate(true)))}
                             >
                             <Image 
                             src={`${ selectedChats.length > 0 ? "/Chat/merge-green.png" : "/Chat/merge-gray.png" }`}

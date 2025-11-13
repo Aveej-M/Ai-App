@@ -47,11 +47,16 @@ const LiveChat = () => {
     const cannedRef = useRef();
     const audioRefs = useRef([]);
     const chatEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
 
     const [openMediaLibrary, setOpenMediaLibrary] = useState(false);
     const [openCannedRes, setOpenCannedRes] = useState(false);
     const [openTemplates, setOpenTemplates] = useState(false);
     const [openMerge, setOpenMerge] = useState(false);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const [showScrollBtn, setShowScrollButton] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+    const [animate, setAnimate] = useState("slide-in-y");
 
     // Filter
     const [filterCount, setFilterCount] = useState(0);
@@ -101,8 +106,45 @@ const LiveChat = () => {
     }, [currentChatIndex, selectedConversation, chatMessages]);
 
     useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (isInitialLoad) {
+            chatEndRef.current?.scrollIntoView({ behavior: "auto" });
+            setIsInitialLoad(false);
+        } else {
+            chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
   }, [chatMessages]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+        const el = chatContainerRef.current;
+        if (!el) return;
+
+        const isNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+
+        if (isNearBottom) {
+            // User is at the bottom, hide the scroll button
+            setAnimate("slide-out-y");
+            setTimeout(() => setIsVisible(false), 300);
+            setShowScrollButton(false);
+        } else {
+            // User is not at the bottom, show the scroll button
+            setIsVisible(true);
+            setAnimate("slide-in-y");
+            setShowScrollButton(true);
+        }
+    };
+
+    const el = chatContainerRef.current;
+    if (el) {
+        el.addEventListener("scroll", handleScroll);
+        // run once on mount so button visibility is correct immediately
+        // handleScroll();
+    }
+
+    return () => {
+        if (el) el.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
     
     const handleAudioPlay = (playingRef) => {
         // Play all audio elements when one starts playing
@@ -402,197 +444,189 @@ const LiveChat = () => {
     // }
 
     const handleUpdateStatus = (status) => {
-    const now = new Date();
-    const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-    const dateString = now.toLocaleDateString('en-GB');
-    const timestampISO = now.toISOString();
-    
-    setChatMessages((prev) => {
-        let updatedChats = [...prev];
-        let movedChat = null;
-
-        // Loop through all groups to find the selected chat
-        updatedChats = updatedChats.map((group) => {
-            if (group.name === selectedConversation) {
-                const remainingChats = group.chats.filter((chat) => {
-                    if (chat.conversationId === selectedChat?.conversationId) {
-                        movedChat = {
-                            ...chat,
-                            status: status,
-                            endDate: dateString,
-                            messages: [
-                                ...chat.messages,
-                                {
-                                    sender: "System",
-                                    role: "system",
-                                    message: `Conversation status changed to ${status} by ${assignedName} at ${time}`,
-                                    timestamp: timestampISO,
-                                },
-                            ],
-                        };
-                        return false; // remove chat from current group
-                    }
-                    return true;
-                });
-
-                return { ...group, chats: remainingChats };
-            }
-            return group;
-        });
-
-        // Return early if chat wasn't found
-        if (!movedChat) return updatedChats;
-
-        // Find the destination group based on status
-        let targetGroupName = "";
-        if (selectedChat.managed_by.type === "admin") {
-            if (status === "waiting_us") targetGroupName = "My Waiting on Us Chats";
-            else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
-            else if (status === "on_hold") targetGroupName = "My On Hold Chats";
-            else if (status === "closed") targetGroupName = "My Resolved Chats";
-            // else if (status === "open_chats") targetGroupName = "All Open Chats";
-        } else {
-            if (status === "waiting_us") targetGroupName = "All Waiting on Us Chats";
-            else if (status === "waiting_customer") targetGroupName = "All Waiting on Customer Chats";
-            else if (status === "on_hold") targetGroupName = "All On Hold Chats";
-            else if (status === "closed") targetGroupName = "All Resolved Chats";
-            else if (status === "open_chats") targetGroupName = "All Open Chats";
-        }
-
-        // Append the moved chat to the target group
-        return updatedChats.map((group) => {
-            if (group.name === targetGroupName) {
-                return {
-                    ...group,
-                    chats: [movedChat, ...group.chats],
-                };
-            }
-            return group;
-        });
-    });
-
-    // Reset UI states
-    setSelectedChat(null);
-    setConversationMessages([]);
-    setCurrentChatIndex(0);
-};
-
-    
-    const updateSelectedChats = (updateField, newValue) => {
         const now = new Date();
-        const today = now.toLocaleDateString("en-GB");
         const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-        const systemMsg = `Conversation updated to ${newValue} by Agent at ${time}`;
+        const dateString = now.toLocaleDateString('en-GB');
+        const timestampISO = now.toISOString();
+    
+        setChatMessages((prev) => {
+            let updatedChats = [...prev];
+            let movedChat = null;
 
-        setChatMessages((prev) =>
-            prev.map((group) => {
-             
-            // First update the chats
-            let updatedChats = group.chats.map((chat) => {
-                if (selectedChats.includes(chat.conversationId)) {
-                const d = new Date();
-                const updatedEndDate = d.toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                });
+            // Loop through all groups to find the selected chat
+            updatedChats = updatedChats.map((group) => {
+                if (group.name === selectedConversation) {
+                    const remainingChats = group.chats.filter((chat) => {
+                        if (chat.conversationId === selectedChat?.conversationId) {
+                            movedChat = {
+                                ...chat,
+                                status: status,
+                                endDate: dateString,
+                                messages: [
+                                    ...chat.messages,
+                                    {
+                                        sender: "System",
+                                        role: "system",
+                                        message: `Conversation status changed to ${status} by ${assignedName} at ${time}`,
+                                        timestamp: timestampISO,
+                                    },
+                                ],
+                            };
+                            return false; // remove chat from current group
+                        }
+                        return true;
+                    });
 
-                const lastMsg = chat.messages[chat.messages.length - 1];
-                const lastDate =  lastMsg ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB") : null;
-
-                const newMessages = [...chat.messages];
-
-                if (lastDate !== today) {
-                    newMessages.push({
-                        sender : "System",
-                        role: "date",
-                        message: today,
-                        timestamp: new Date().toISOString(),
-                    })
+                    return { ...group, chats: remainingChats };
                 }
-
-                newMessages.push({
-                    sender: "System",
-                    role: "system",
-                    message: systemMsg,
-                    timestamp: now.toISOString(),
-                });
-
-                // const updatedMessages = chat.messages
-                //     ? [
-                //         ...chat.messages,
-                //         {
-                //         sender: "System",
-                //         role: "system",
-                //         message: systemMsg,
-                //         timestamp: new Date().toISOString(),
-                //         },
-                //     ]
-                //     : chat.messages;
-
-                return {
-                    ...chat,
-                    [updateField]: newValue,
-                    endDate: updatedEndDate,
-                    messages: newMessages,
-                };
-                }
-                return chat;
+                return group;
             });
 
-            // Now reorder updated chats to bring updated ones to the front
-            const reorderedChats = [
-                ...updatedChats.filter((chat) => selectedChats.includes(chat.conversationId)),
-                ...updatedChats.filter((chat) => !selectedChats.includes(chat.conversationId)),
-            ];
+            // Return early if chat wasn't found
+            if (!movedChat) return updatedChats;
 
-            return { ...group, chats: reorderedChats };
-            })
-            
-        );
+            // Find the destination group based on status
+            let targetGroupName = "";
+            if (selectedChat.managed_by.type === "admin") {
+                if (status === "waiting_us") targetGroupName = "My Waiting on Us Chats";
+                else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
+                else if (status === "on_hold") targetGroupName = "My On Hold Chats";
+                else if (status === "closed") targetGroupName = "My Resolved Chats";
+                else if (status === "open_chats") targetGroupName = "All Open Chats";
+            } else {
+                if (status === "waiting_us") targetGroupName = "All Waiting on Us Chats";
+                else if (status === "waiting_customer") targetGroupName = "All Waiting on Customer Chats";
+                else if (status === "on_hold") targetGroupName = "All On Hold Chats";
+                else if (status === "closed") targetGroupName = "All Resolved Chats";
+                else if (status === "open_chats") targetGroupName = "All Open Chats";
+            }
 
+            // Append the moved chat to the target group
+            return updatedChats.map((group) => {
+                if (group.name === targetGroupName) {
+                    return {
+                        ...group,
+                        chats: [movedChat, ...group.chats],
+                    };
+                }
+                return group;
+            });
+        });
+
+        // Reset UI states
         setSelectedChat(null);
         setConversationMessages([]);
         setCurrentChatIndex(0);
-
-        setSelectedChats([]);
-        setOpenBulkUpdate(false);
-        setOpenMerge(false);
     };
+
+    // const updateSelectedChats = (updateField, newValue, newLabel ) => {
+    //     const now = new Date();
+    //     const today = now.toLocaleDateString("en-GB");
+    //     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+    //     const systemMsg = `Conversation updated to ${newLabel} by Jeeva at ${time}`;
+
+    //     setChatMessages((prev) =>
+    //         prev.map((group) => {
+             
+    //         // First update the chats
+    //         let updatedChats = group.chats.map((chat) => {
+    //             if (selectedChats.includes(chat.conversationId)) {
+    //                 const d = new Date();
+    //                 const updatedEndDate = d.toLocaleDateString("en-GB", {
+    //                     day: "2-digit",
+    //                     month: "2-digit",
+    //                     year: "numeric",
+    //                 });
+
+    //                 const lastMsg = chat.messages[chat.messages.length - 1];
+    //                 const lastDate =  lastMsg ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB") : null;
+
+    //                 const newMessages = [...chat.messages];
+
+    //                 if (lastDate !== today) {
+    //                     newMessages.push({
+    //                         sender : "System",
+    //                         role: "date",
+    //                         message: today,
+    //                         timestamp: new Date().toISOString(),
+    //                     })
+    //                 }
+
+    //                 newMessages.push({
+    //                     sender: "System",
+    //                     role: "system",
+    //                     message: systemMsg,
+    //                     timestamp: now.toISOString(),
+    //                 });
+
+    //                 if (updateField === "status") {
+    //                     return {
+    //                         ...chat,
+    //                         [updateField]: newValue,
+    //                         endDate: updatedEndDate,
+    //                         messages: newMessages,
+    //                     };
+    //                 } else {
+    //                     return {
+    //                         ...chat,
+    //                         [updateField]: {type: newValue, name: newLabel},
+    //                         endDate: updatedEndDate,
+    //                         messages: newMessages,
+    //                     };
+    //                 }
+    //             }
+    //             return chat;
+    //         });
+
+    //         // Now reorder updated chats to bring updated ones to the front
+    //         const reorderedChats = [
+    //             ...updatedChats.filter((chat) => selectedChats.includes(chat.conversationId)),
+    //             ...updatedChats.filter((chat) => !selectedChats.includes(chat.conversationId)),
+    //         ];
+            
+    //         return { ...group, chats: reorderedChats };
+    //         })
+            
+    //     );
+
+    //     setSelectedChat(null);
+    //     setConversationMessages([]);
+    //     setCurrentChatIndex(0);
+
+    //     setSelectedChats([]);
+    //     setOpenBulkUpdate(false);
+    //     setOpenMerge(false);
+    //     setAssignedName(newLabel);
+    // };
+    // console.log(chatMessages, "Chart messages");
        
-    const handleUpdateUser = (name) => {
+    const updateSelectedChats = (updateField, newValue, newLabel) => {
         const now = new Date();
         const today = now.toLocaleDateString("en-GB");
         const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-        const systemMsg = `Assigned to ${name} by Jeeva at ${time}`;
-        // If no bulk selection, target the currently open chat
-        const targetIds = (selectedChats && selectedChats.length > 0)
-            ? selectedChats
-            : (selectedChat ? [selectedChat.conversationId] : []);
+        const systemMsg = `Conversation updated to ${newLabel} by Jeeva at ${time}`;
 
-        if (targetIds.length === 0) {
-            // nothing selected and no open chat -> just update assigned name fields
-            setAssignedName(name);
-            setPrevAssignedName(name);
-            return;
-        }
+        setChatMessages((prevGroups) => {
+            let movedChats = []; // Chats that will move between groups
 
-        setChatMessages((prev) =>
-            prev.map((group) => {
-                // First update the chats
+            // Step 1: Update chats & collect moved ones
+            const updatedGroups = prevGroups.map((group) => {
                 const updatedChats = group.chats.map((chat) => {
-                    if (targetIds.includes(chat.conversationId)) {
+                    if (selectedChats.includes(chat.conversationId)) {
                         const updatedEndDate = now.toLocaleDateString("en-GB", {
                             day: "2-digit",
                             month: "2-digit",
                             year: "numeric",
                         });
 
-                        const lastMsg = chat.messages && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
-                        const lastDate = lastMsg ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB") : null;
+                        const lastMsg = chat.messages?.length
+                            ? chat.messages[chat.messages.length - 1]
+                            : null;
+                        const lastDate = lastMsg
+                            ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB")
+                            : null;
 
                         const newMessages = [...(chat.messages || [])];
-
                         if (lastDate !== today) {
                             newMessages.push({
                                 sender: "System",
@@ -609,50 +643,245 @@ const LiveChat = () => {
                             timestamp: now.toISOString(),
                         });
 
-                        return {
-                            ...chat,
-                            endDate: updatedEndDate,
-                            messages: newMessages,
-                            managed_by: { ...(chat.managed_by || {}), name }, // update managed_by.name
-                        };
+                        // Update chat field
+                        let updatedChat;
+                        if (updateField === "status") {
+                            updatedChat = {
+                                ...chat,
+                                [updateField]: newValue,
+                                endDate: updatedEndDate,
+                                messages: newMessages,
+                            };
+                        } else {
+                            updatedChat = {
+                                ...chat,
+                                [updateField]: { type: newValue, name: newLabel },
+                                endDate: updatedEndDate,
+                                messages: newMessages,
+                            };
+                        }
+
+                        // --- Determine target group based on managed_by & status ---
+                        const status = updatedChat.status || "";
+                        const type = updatedChat.managed_by?.type || "team"; // fallback
+                        let targetGroupName = "";
+
+                        if (type === "agent") {
+                             targetGroupName = "All Bot Conversations";
+                            // else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
+                            // else if (status === "on_hold") targetGroupName = "My On Hold Chats";
+                            // else if (status === "closed") targetGroupName = "My Resolved Chats";
+                            // else targetGroupName = "My Open Chats";
+                        } else {
+                            if (status === "waiting_us") targetGroupName = "My Waiting on Us Chats";
+                            else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
+                            else if (status === "on_hold") targetGroupName = "My On Hold Chats";
+                            else if (status === "closed") targetGroupName = "My Resolved Chats";
+                            else targetGroupName = "My Open Chats";
+                        }
+
+                        movedChats.push({ ...updatedChat, targetGroupName });
+                        return null; // remove from current group
                     }
                     return chat;
                 });
 
-                // Now reorder updated chats to bring updated ones to the front
-                const reorderedChats = [
-                    ...updatedChats.filter((chat) => targetIds.includes(chat.conversationId)),
-                    ...updatedChats.filter((chat) => !targetIds.includes(chat.conversationId)),
-                ];
+                return { ...group, chats: updatedChats.filter(Boolean) };
+            });
 
-                return { ...group, chats: reorderedChats };
-            })
-        );
+            // Step 2: Append moved chats into their target groups
+            const finalGroups = updatedGroups.map((group) => {
+                const chatsToMove = movedChats.filter(
+                    (chat) => chat.targetGroupName === group.name
+                );
+                if (chatsToMove.length > 0) {
+                    return {
+                        ...group,
+                        chats: [...chatsToMove, ...group.chats], // prepend moved chats
+                    };
+                }
+                return group;
+            });
 
-        // Update currently selected chat and its messages if it was affected
-        setSelectedChat((prev) => {
-            if (prev && targetIds.includes(prev.conversationId)) {
-                const updated = { ...prev, managed_by: { ...(prev.managed_by || {}), name } };
+            return finalGroups;
+        });
 
-                // also append system message to conversationMessages shown in UI
-                setConversationMessages((curMsgs) => {
-                    const lastMsg = curMsgs && curMsgs.length ? curMsgs[curMsgs.length - 1] : null;
-                    const lastDate = lastMsg ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB") : null;
-                    let newMessages = [...(curMsgs || [])];
-                    if (lastDate !== today) newMessages.push({ sender: "System", role: "date", message: today, timestamp: now.toISOString() });
-                    newMessages.push({ sender: "System", role: "system", message: systemMsg, timestamp: now.toISOString() });
-                    return newMessages;
+        // Reset selection & UI state
+        setSelectedChat(null);
+        setConversationMessages([]);
+        setCurrentChatIndex(0);
+        setSelectedChats([]);
+        setOpenBulkUpdate(false);
+        setOpenMerge(false);
+        setAssignedName(newLabel);
+    };
+
+    const handleUpdateUser = (name, type) => {
+        const now = new Date();
+        const today = now.toLocaleDateString("en-GB");
+        const time = now.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+        const systemMsg = `Assigned to ${name} by Jeeva at ${time}`;
+
+        const targetIds =
+            selectedChats && selectedChats.length > 0
+            ? selectedChats
+            : selectedChat
+            ? [selectedChat.conversationId]
+            : [];
+
+        if (targetIds.length === 0) {
+            setAssignedName(name);
+            setPrevAssignedName(name);
+            return;
+        }
+
+        setChatMessages((prevGroups) => {
+            let movedChats = []; // store chats that should move
+
+            // Step 1: Update chats and collect moved ones
+            const updatedGroups = prevGroups.map((group) => {
+            const updatedChats = group.chats.map((chat) => {
+                if (targetIds.includes(chat.conversationId)) {
+                const updatedEndDate = now.toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
                 });
 
-                return updated;
+                const lastMsg =
+                    chat.messages && chat.messages.length
+                    ? chat.messages[chat.messages.length - 1]
+                    : null;
+                const lastDate = lastMsg
+                    ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB")
+                    : null;
+
+                const newMessages = [...(chat.messages || [])];
+                if (lastDate !== today) {
+                    newMessages.push({
+                    sender: "System",
+                    role: "date",
+                    message: today,
+                    timestamp: now.toISOString(),
+                    });
+                }
+
+                newMessages.push({
+                    sender: "System",
+                    role: "system",
+                    message: systemMsg,
+                    timestamp: now.toISOString(),
+                });
+
+ 
+                const status = chat?.status || "";
+                let targetGroupName = "";
+
+                if (type === "admin") {
+                    if (status === "waiting_us") targetGroupName = "My Waiting on Us Chats";
+                    else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
+                    else if (status === "on_hold") targetGroupName = "My On Hold Chats";
+                    else if (status === "closed") targetGroupName = "My Resolved Chats";
+                    else targetGroupName = "My Open Chats";
+                } else if (type === "team") {
+                    if (status === "new") targetGroupName = "All Open Chats";
+                    else targetGroupName = "All Unassigned Chats";
+                } else {
+                    if (status === "waiting_us") targetGroupName = "All Waiting on Us Chats";
+                    else if (status === "waiting_customer") targetGroupName = "All Waiting on Customer Chats";
+                    else if (status === "on_hold") targetGroupName = "All On Hold Chats";
+                    else if (status === "closed") targetGroupName = "All Resolved Chats";
+                    // else if (status === "open_chats") targetGroupName = "All Open Chats";
+                }
+
+                const updatedChat = {
+                    ...chat,
+                    endDate: updatedEndDate,
+                    messages: newMessages,
+                    managed_by: { type: type, value: name },
+                    targetGroupName,
+                };
+                console.log(updatedChat, "updated chat");
+
+                // Store it for moving to target group
+                movedChats.push(updatedChat);
+
+                // Remove from current group
+                return null;
+                }
+                return chat;
+            });
+
+            return { ...group, chats: updatedChats.filter(Boolean) };
+            });
+
+            // Step 2: Move each updated chat into its target group
+            let finalGroups = updatedGroups.map((group) => {
+            // Find chats whose target group matches this group name
+            const chatsToMove = movedChats.filter(
+                (chat) => chat.targetGroupName === group.name
+            );
+
+            if (chatsToMove.length > 0) {
+                return {
+                ...group,
+                chats: [...chatsToMove, ...group.chats], // prepend moved chats
+                };
+            }
+
+            return group;
+            });
+
+            return finalGroups;
+        });
+
+        // Update selected chat in state
+        setSelectedChat((prev) => {
+            if (prev && targetIds.includes(prev.conversationId)) {
+            const updated = {
+                ...prev,
+                managed_by: { ...(prev.managed_by || {}), name },
+            };
+
+            setConversationMessages((curMsgs) => {
+                const lastMsg =
+                curMsgs && curMsgs.length ? curMsgs[curMsgs.length - 1] : null;
+                const lastDate = lastMsg
+                ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB")
+                : null;
+
+                let newMessages = [...(curMsgs || [])];
+                if (lastDate !== today)
+                newMessages.push({
+                    sender: "System",
+                    role: "date",
+                    message: today,
+                    timestamp: now.toISOString(),
+                });
+                newMessages.push({
+                sender: "System",
+                role: "system",
+                message: systemMsg,
+                timestamp: now.toISOString(),
+                });
+                return newMessages;
+            });
+
+            return updated;
             }
             return prev;
         });
 
         setAssignedName(name);
         setPrevAssignedName(name);
-        setSelectedChats([]); // Clear selected chats after assignment
+        setSelectedChats([]);
     };
+
+
 
 
 
@@ -700,7 +929,7 @@ const LiveChat = () => {
                 <BulkUpdate 
                     setOpneBulkUpdate={setOpenBulkUpdate}
                     selectedIds={selectedChats}
-                    onUpdate={updateSelectedChats}
+                    updateSelectedChats={updateSelectedChats}
                     handleUpdateStatus={handleUpdateStatus}
                 />
             )}
@@ -800,7 +1029,9 @@ const LiveChat = () => {
                                                 e.stopPropagation();
                                                 // setAssignedName(opt.value);
                                                 // setPrevAssignedName(opt.value);
-                                                handleUpdateUser(opt.value);
+                                                handleUpdateUser(opt.value, opt.type);
+                                                // console.log(opt.type, "TYPE")
+                                                console.log(opt.value, "Name");
                                                 setOpenAssignUser(false);
                                             }}
                                             >{opt.value}</h2>
@@ -844,9 +1075,15 @@ const LiveChat = () => {
                         </div>
                     )}
 
-                    <div className="flex justify-between flex-col h-[90%]">
-                        <div className={`${selectedConversation && conversationMessages.length > 0 ? "bg-[url(/whats-bg.png)] bg-cover" : "bg-gray-100"} h-full overflow-y-auto pt-3 relative`}>
-                            <i className="fa-solid fa-circle-chevron-down text-3xl text-white bg-black rounded-full fixed bottom-40 right-8 z-10"></i>
+                    <div className="flex justify-between flex-col h-[91.5%]">
+                        <div ref={chatContainerRef} className={`${selectedConversation && conversationMessages.length > 0 ? "bg-[url(/whats-bg.png)] bg-cover" : "bg-gray-100"} h-full overflow-y-auto pt-3 relative`}>
+                            {isVisible && (
+                            <i onClick={
+                             () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
+                            }
+                            className={`fa-solid fa-angle-down text-black bg-white rounded-full fixed ${selectedChat?.status !== "closed" ? "bottom-40" : "bottom-30"} right-8 z-20 px-3 py-2.5 shadow-5 cursor-pointer ${animate} transition-all duration-400`}></i>
+                            )}
+
                             <div className=" flex flex-col w-full h-full">
                                 {selectedConversation && conversationMessages.length > 0 && (
                                 <div className="w-full flex-items mb-3">

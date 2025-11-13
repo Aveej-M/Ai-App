@@ -31,7 +31,7 @@ export const chatData = {
             {
               sender: "Guest user",
               role: "customer",
-              message: "can i know about ai",
+              message: "can i know about agent",
               timestamp: "2025-10-17T12:05:00Z"
             },
             {
@@ -86,7 +86,7 @@ export const chatData = {
 };
 
 export const chatManage = [
-    { label: "AI Chatbot", value:"ai-chat" },
+    { label: "AI Chatbot", value:"agent-chat" },
     { label: "All", value:"all" },
     { label: "Chatbot", value:"bot" },
     { label: "Team", value:"team" },
@@ -125,10 +125,10 @@ export const lifeCycleData = [
 ]
 
 export const assignOptions = [
-    { category: "Assign to Team - This will move a conversation to unassigned status", value: "Team" },
-    { category: "Assign to User", value: "Jeeva" },
-    { category: "Assign to AI Agent", value: "Agent Spark" },
-    { category: "Assign to Web Bot", value: "Default Live Chat" },
+    { category: "Assign to Team - This will move a conversation to unassigned status", value: "Team", type: "team" },
+    { category: "Assign to User", value: "Jeeva", type: "admin" },
+    { category: "Assign to AI Agent", value: "Agent Spark", type: "ai" },
+    { category: "Assign to Web Bot", value: "Default Live Chat", type: "" },
   ];
 
 export const chatMessages = [
@@ -186,8 +186,8 @@ export const chatMessages = [
     name: "All Resolved Chats", 
     chats: [
       {
-        conversationId: "bot-chat-001",
-        user: "Guest user 1",
+        conversationId: "bot-chat-009",
+        user: "Guest user 9",
         channel: "Web",
         startDate: "19/08/2025",
         endDate: "27/08/2025",
@@ -270,6 +270,7 @@ export const chatMessages = [
         channel: "Web",
         startDate: "19/08/2025",
         endDate: "27/08/2025",
+        
         messages: [
           {
             sender: "System",
@@ -375,7 +376,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        managed_by: {type: "admin", name: "Jeeva"},
+        managed_by: {type: "agent", name: "Agent Spark"},
         source: "web",
         status: "new",
         isRead: false,
@@ -448,7 +449,7 @@ export const chatMessages = [
             timestamp: "2025-08-19T10:30:00Z"
           }
         ],
-        managed_by: {type: "admin", name: "Jeeva"},
+        managed_by: {type: "agent", name: "Agent Spark"},
         source: "whatsapp",
         status: "closed",
         isRead: false,
@@ -723,7 +724,7 @@ export const chatMessages = [
             timestamp: "2025-10-16T11:45:00Z"
           }
         ],
-        managed_by: "ai-chat",
+        managed_by: "agent-chat",
         source: "web",
         status: "new",
         isRead: true,
@@ -757,13 +758,13 @@ export const bulkUpdateData = [
 
 export const assigntoData = [
     { label: "Assign to User", options: [
-      { value: "pradeep", label: "Pradeep Chandran", type: "user" },
+      { value: "admin", label: "Jeeva", type: "admin" },
     ], },
     { label: "Assign to Bot", options: [
-        { value: "bot-1", label: "Bot", type: "bot" },
+        { value: "bot", label: "", type: "bot" },
         ], },
     { label: "Assign to AI Agent", options: [
-      { value: "agent-spark", label: "Agent Spark", type: "ai" },
+      { value: "agent", label: "Agent Spark", type: "agent" },
     ], },
 ];
 

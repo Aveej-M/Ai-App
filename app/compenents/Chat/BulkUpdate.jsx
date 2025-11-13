@@ -4,12 +4,14 @@ import Select from "react-select";
 import { customStyles } from "../../data/selectStyle";
 import { bulkUpdateData, assigntoData, conversationStatusData } from "../../data/chat";
 
-const BulkUpdate = ({ setOpneBulkUpdate, selectedIds = [], onUpdate, handleUpdateStatus }) => {
+const BulkUpdate = ({ setOpneBulkUpdate, selectedIds = [], updateSelectedChats, handleUpdateStatus }) => {
     const [animateOut, setAnimateOut] = useState(false);
     // const [searchInput, setSearchInput] = useState("");
     const [updateData, setUpdateData] = useState("");
     const [assignTo, setAssignTo] = useState("");
     const [convoStatus, setConvoStatus] = useState("");
+    const [assignLabel, setAssignLabel] = useState("");
+    const [convoLabel, setConvoLabel] = useState("");
 
     const handleClearUpdate = () => {
         setUpdateData("");
@@ -17,6 +19,7 @@ const BulkUpdate = ({ setOpneBulkUpdate, selectedIds = [], onUpdate, handleUpdat
         setConvoStatus("");
     };
 
+    console.log(convoLabel, "Convo label");
 
   return (
     <div className="h-full w-full bg-black/80 absolute top-0 left-0 z-50 flex justify-center">
@@ -48,29 +51,29 @@ const BulkUpdate = ({ setOpneBulkUpdate, selectedIds = [], onUpdate, handleUpdat
                     }
                 </div>
 
-            {updateData === "assign_to" &&
-                <Select 
-                    instanceId="select_assign"
-                    options={assigntoData}
-                    value={assigntoData
-                    .flatMap(group => group.options)
-                    .find(option => option.value === assignTo) || null}
-                    onChange={(e)=> setAssignTo(e?.value || "")}
-                    styles={customStyles}
-                    className="w-full text-sm"
-                    placeholder="Select User or Bot"
-                    components={{
-                    IndicatorSeparator: () => null
-                    }}
-                />
-            }
+                {updateData === "assign_to" &&
+                    <Select 
+                        instanceId="select_assign"
+                        options={assigntoData}
+                        value={assigntoData
+                        .flatMap(group => group.options)
+                        .find(option => option.value === assignTo) || null}
+                        onChange={(e)=> (setAssignTo(e?.value || ""), setAssignLabel(e?.label))}
+                        styles={customStyles}
+                        className="w-full text-sm"
+                        placeholder="Select User or Bot"
+                        components={{
+                        IndicatorSeparator: () => null
+                        }}
+                    />
+                }
 
                 {updateData === "update_convo_status" &&    
                 <Select 
                     instanceId="select_bulk"
                     options={conversationStatusData}
                     value={conversationStatusData.find(option => option.value === convoStatus) || null}
-                    onChange={(e)=> setConvoStatus(e?.value || "")}
+                    onChange={(e)=> (setConvoStatus(e?.value || ""), setConvoLabel(e?.label)) }
                     styles={customStyles}
                     className="w-full text-sm"
                     placeholder="Select Status"
@@ -79,30 +82,29 @@ const BulkUpdate = ({ setOpneBulkUpdate, selectedIds = [], onUpdate, handleUpdat
                     }}
                 />}
             </div>
+            <div className="w-full flex justify-end gap-3 pt-3">
+                <button onClick={()=> setOpneBulkUpdate(false)}
+                className="h-8 border px-4 text-gray-400 hover:bg-gray-200 text-sm rounded-3xl transition-all">
+                    Cancel
+                </button>
 
-                    <div className="w-full flex justify-end gap-3 pt-3">
-                        <button onClick={()=> setOpneBulkUpdate(false)}
-                        className="h-8 border px-4 text-gray-400 hover:bg-gray-200 text-sm rounded-3xl transition-all">
-                            Cancel
-                        </button>
-
-                        <button
-                            onClick={() => {
-                                // do nothing if nothing selected or no update selected
-                                if (!updateData || selectedIds.length === 0) return;
-                                if (updateData === 'assign_to') {
-                                    onUpdate && onUpdate('assignedTo', assignTo || '');
-                                } else if (updateData === 'update_convo_status') {
-                                    onUpdate && onUpdate('status', convoStatus || '');
-                                }
-                                setOpneBulkUpdate(false);
-                            }}
-                            className={`h-8 border border-green-500 px-4 text-white ${(!updateData || selectedIds.length === 0) ? 'bg-gray-300 text-gray-400 cursor-not-allowed' : 'hover:bg-green-300 bg-green-400'} text-sm rounded-3xl transition-all`}
-                            disabled={!updateData || selectedIds.length === 0}
-                        >
-                            Update
-                        </button>
-                    </div>
+                <button
+                    onClick={() => {
+                        // do nothing if nothing selected or no update selected
+                        if (!updateData || selectedIds.length === 0) return;
+                        if (updateData === 'assign_to') {
+                            updateSelectedChats && updateSelectedChats('managed_by', assignTo, assignLabel || '');
+                        } else if (updateData === 'update_convo_status') {
+                            updateSelectedChats && updateSelectedChats('status', convoStatus, convoLabel || '');
+                        }
+                        setOpneBulkUpdate(false);
+                    }}
+                    className={`h-8 border border-green-500 px-4 text-white ${(!updateData || selectedIds.length === 0) ? 'bg-gray-300 text-gray-400 cursor-not-allowed' : 'hover:bg-green-300 bg-green-400'} text-sm rounded-3xl transition-all`}
+                    disabled={!updateData || selectedIds.length === 0}
+                >
+                    Update
+                </button>
+            </div>
         </div>
     </div>
   )
