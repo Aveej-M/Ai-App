@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { isToday, isYesterday, parse } from "date-fns";
 
 const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, openMerge, chatMessages,selectedChat,truncateText, currentChatIndex, handelSelectConversationMsg, setBookMark, setOpenMerge, selectedChats, setOpenSearchTab, handleNavigateChat, isSelectAll, handleSelectAllToggle, handleCheckboxToggle, setOpenBulkUpdate, setOpenConversationTab,setOpenFilterTab, sourceChat, manageChat, statusConversation, filterCount }) => {
 
@@ -185,15 +186,29 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                         //     filteredChats.filter(item => item.user.toLowerCase().includes(searchInput.toLowerCase())
                         // && ( statusConversation === "" || item.status === statusConversation)
                         // && (sourceChat === "all" || item.source === sourceChat))
-                            visibleChats.map((chat, msgIdx) => (
+                            visibleChats.map((chat, msgIdx) => {
+                                // console.log(chat.endDate, "Date");
+                                const [datePart, timePart] = chat.endDate.split(", ");
+                                
+                                const endDate = parse(datePart, "dd/MM/yyyy", new Date());
+
+                                return(
                             <div
                             key={chat.conversationId}
                             className={`border-b border-b-gray-400 hover:bg-gray-100 justify-items py-3 px-6 cursor-pointer ${selectedChat && selectedChat.conversationId === chat.conversationId ? 'bg-gray-200 hover:bg-gray-200' : ''}`}
-                            onClick={!openMerge ? () => {
-                                const originalIdx = conversationGroup.chats.findIndex(c => c.conversationId === chat.conversationId);
-                                // fallback to msgIdx if not found (shouldn't happen but guard just in case)
-                                handelSelectConversationMsg(chat.conversationId, originalIdx !== -1 ? originalIdx : msgIdx);
-                            } : undefined}
+                            onClick={() => {
+                                if (openMerge) {
+                                handleCheckboxToggle(chat.conversationId);
+                                } else {
+                                const originalIdx = conversationGroup.chats.findIndex(
+                                    (c) => c.conversationId === chat.conversationId
+                                );
+                                handelSelectConversationMsg(
+                                    chat.conversationId,
+                                    originalIdx !== -1 ? originalIdx : msgIdx
+                                );
+                                }
+                            }}
                             >
                                 <div className="flex-items">
                                     {openMerge && (
@@ -242,11 +257,11 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
 
                             <div className="flex-items-2 gap-1">
                                 <i className="fa-solid fa-globe text-[#0082d1]"></i>
-                                <p className="text-xs text-gray-400">{chat.endDate}</p>
+                                <p className="text-xs text-gray-400">{isToday(endDate) ? timePart : isYesterday(endDate) ? "Yesterday" : chat.endDate}</p>
                             </div>
                             {/* <p className="text-gray-500 text-sm">{chat.status}</p> */}
                             </div>
-                            )))
+                            )}))
                             : (
                                 <p className="h-full flex items-center justify-center mt-8 text-sm text-gray-400">
                                     No {filterType === "unread" ? "Unread" : "Conversations"} Found
@@ -280,9 +295,9 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                             className="fa-solid fa-chevron-left cursor-pointer text-gray-600 hover:text-gray-500"
                             onClick={() => navigateFiltered("prev")}
                             ></i>
-                                                        <p className="border-2 border-green-500 bg-green-200 px-2 py-0.5 text-green-600 rounded ">
-                                                        {visibleChats.length > 0 ? (currentVisiblePos !== -1 ? currentVisiblePos + 1 : 0) : currentChatIndex + 1}
-                                                        </p>
+                                <p className="border-2 border-green-500 bg-green-200 px-2 py-0.5 text-green-600 rounded ">
+                                {visibleChats.length > 0 ? (currentVisiblePos !== -1 ? currentVisiblePos + 1 : 0) : currentChatIndex + 1}
+                                </p>
                             <i
                             className="fa-solid fa-chevron-right cursor-pointer text-gray-600 hover:text-gray-500"
                             onClick={() => navigateFiltered("next")}

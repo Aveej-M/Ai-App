@@ -127,7 +127,7 @@ export const lifeCycleData = [
 export const assignOptions = [
     { category: "Assign to Team - This will move a conversation to unassigned status", value: "Team", type: "team" },
     { category: "Assign to User", value: "Jeeva", type: "admin" },
-    { category: "Assign to AI Agent", value: "Agent Spark", type: "ai" },
+    { category: "Assign to AI Agent", value: "Agent Spark", type: "agent" },
     { category: "Assign to Web Bot", value: "Default Live Chat", type: "" },
   ];
 
@@ -275,7 +275,7 @@ export const chatMessages = [
           {
             sender: "System",
             role: "date",
-            message: "19/08/2025",
+            message: "13/11/2025",
             timestamp: "2025-08-19T09:59:00Z"
           },
           {
@@ -343,12 +343,12 @@ export const chatMessages = [
         user: "Guest user 2",
         channel: "Web",
         startDate: "16/10/2025",
-        endDate: "27/08/2025",
+        endDate: "13/11/2025",
         messages: [
           {
             sender: "System",
             role: "date",
-            message: "16/08/2025",
+            message: "13/11/2025",
             timestamp: "2025-08-19T09:59:00Z"
           },
           {

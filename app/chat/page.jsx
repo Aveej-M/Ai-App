@@ -11,6 +11,7 @@ import { assignOptions, chatMessages as initialChatData  } from "../data/chat";
 import SendTemplates from "../compenents/Chat/SendTemplates";
 import CannedResponse from "../compenents/Chat/CannedResponse";
 import ConversationView from "../compenents/Chat/ConversationView";
+import { parse, isToday, isYesterday } from "date-fns";
 
 const LiveChat = () => {
     const [chatMessages, setChatMessages] = useState(initialChatData);
@@ -22,7 +23,7 @@ const LiveChat = () => {
 
     const [selectedConversation, setSelectedConversation] = useState(null);
     const [selectedChat, setSelectedChat] = useState(null);
-    const [currentChatIndex, setCurrentChatIndex] = useState(0);
+    const [currentChatIndex, setCurrentChatIndex] = useState(null);
     const [conversationMessages, setConversationMessages] = useState([]);
     const [selectedChats, setSelectedChats] = useState([]);
 
@@ -57,6 +58,7 @@ const LiveChat = () => {
     const [showScrollBtn, setShowScrollButton] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [animate, setAnimate] = useState("slide-in-y");
+    const [prevType, setPrevType] = useState(null); 
 
     // Filter
     const [filterCount, setFilterCount] = useState(0);
@@ -202,35 +204,6 @@ const LiveChat = () => {
         );
     };
 
-    // const handleNavigateChat = (direction) => {
-    //     const selectedGroup = chatMessages.find(
-    //         (g) => g.name === selectedConversation
-    //     );
-
-    //     if (!selectedGroup) return;
-
-    //     const maxIndex = Math.max(selectedGroup.chats.length - 1, 0);
-
-    //     // compute new index synchronously so we can update selectedChat immediately
-    //     let newIndex = currentChatIndex || 0;
-    //     if (direction === "first") newIndex = 0;
-    //     else if (direction === "last") newIndex = maxIndex;
-    //     else if (direction === "prev") newIndex = Math.max(newIndex - 1, 0);
-    //     else if (direction === "next") newIndex = Math.min(newIndex + 1, maxIndex);
-
-    //     setCurrentChatIndex(newIndex);
-
-    //     const newChat = selectedGroup.chats[newIndex];
-    //     if (newChat) {
-    //         setSelectedChat(newChat);
-    //         setConversationMessages(newChat.messages || []);
-    //     } else {
-    //         setSelectedChat(null);
-    //         setConversationMessages([]);
-    //     }
-    // };
-
-
     const handleSelectAllToggle = () => {
         if (isSelectAll) {
             setSelectedChats([]); // Unselect all
@@ -265,7 +238,7 @@ const LiveChat = () => {
         )
         const found = chatMessages.find((c) => c.name === selectedConversation);
         const foundChat = found?.chats.find((chat) => chat.conversationId === conversationId);
-        console.log(foundChat, "found")
+
         if (found && found.chats && found.chats.length > 0 && found.chats[idx].conversationId === conversationId) {
             setSelectedChat(foundChat)
             setConversationMessages(found.chats[idx].messages || []);
@@ -320,9 +293,6 @@ const LiveChat = () => {
         return text.length > maxLength ? text.slice(0, maxLength) + "..." : text;
     };
 
-    // Return a suitable reply string for a message.
-    // If the message has attachments, prefer their filenames (comma separated).
-    // Otherwise fall back to the message text (stripped of HTML tags if present).
     const getReplyText = (msg) => {
         if (!msg) return "";
 
@@ -361,92 +331,17 @@ const LiveChat = () => {
         });
     };
 
-    // const handleUpdateStatus = () => {
-    //     const now = new Date();
-    //     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-    //     const date = now.toLocaleDateString('en-GB', { hour: "2-digit", minute: "2-digit", hour12: true })
-    //     const resolvedMsg = `Conversation status changed from On hold to Closed by ${assignedName} at ${time}`
-
-    //     if (!resolvedMsg) return;
-    //     const newMessage = {
-    //         sender : "System",
-    //         role: "system",
-    //         message: resolvedMsg,
-    //         timestamp: new Date().toISOString(),
-    //     };
-
-    //     setConversationMessages((prev) => [...prev, newMessage])
-    //     setSelectedChat((prev) => ({
-    //         ...prev,
-    //         endDate: date, 
-    //         status: "closed"
-    //     }));
-    // }
-
-    // const handleUpdateStatus = (status) => {
-    //     const now = new Date();
-    //     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-    //     const date = now.toLocaleDateString('en-GB', { hour: "2-digit", minute: "2-digit", hour12: true });
-    //     const nowISO = now.toISOString();
-    //     const today = now.toLocaleDateString("en-GB");
-    //     setChatMessages((prev) =>
-    //         prev.map((group) => {
-    //             if (group.name !== selectedConversation) return group;
-
-    //             // Update chats
-    //             const updatedChats = group.chats.map((chat) => {
-    //                 if (selectedChat && chat.conversationId === selectedChat.conversationId) {
-    //                         const statusLabel = status === "waiting_customer" ? "Waiting on customer" : status === "new" ? "New" : status === "waiting_us" ? "Waiting on us" : "Closed";
-    //                         const prevStatus = chat.status === "waiting_customer" ? "Waiting on customer" : chat.status === "new" ? "New" : chat.status === "waiting_us" ? "Waiting on us" : "Closed";
-    //                         const resolvedMsg = `Conversation status updated from ${prevStatus} to ${statusLabel} by ${assignedName} at ${time}`;
-
-    //                     // prepare messages: ensure there's a date system message when day changes
-    //                     const lastMsg = chat.messages && chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null;
-    //                     const lastDate = lastMsg ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB") : null;
-
-    //                     const newMessages = chat.messages ? [...chat.messages] : [];
-    //                     if (lastDate !== today) {
-    //                         newMessages.push({ sender: "System", role: "date", message: today, timestamp: nowISO });
-    //                     }
-    //                     newMessages.push({ sender: "System", role: "system", message: resolvedMsg, timestamp: nowISO });
-
-    //                     const updatedEndDate = now.toLocaleDateString("en-GB", {
-    //                         day: "2-digit",
-    //                         month: "2-digit",
-    //                         year: "numeric",
-    //                     });
-
-    //                     return {
-    //                         ...chat,
-    //                         endDate: updatedEndDate,
-    //                         status: status,
-    //                         messages: newMessages,
-    //                     };
-    //                 }
-
-    //                 return chat;
-    //             });
-
-    //             const reordered = [
-    //                 ...updatedChats.filter((c) => selectedChat && c.conversationId === selectedChat.conversationId),
-    //                 ...updatedChats.filter((c) => !(selectedChat && c.conversationId === selectedChat.conversationId)),
-    //             ];
-
-    //             return { ...group, chats: reordered };
-    //         })
-    //     );
-
-    //     setSelectedChat((prev) => prev ? { ...prev, endDate: now.toLocaleDateString("en-GB"), status: status } : prev);
-
-    //     setSelectedChat(null);
-    //     setConversationMessages([]);
-    //     setCurrentChatIndex(0);
-    // }
-
     const handleUpdateStatus = (status) => {
         const now = new Date();
         const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-        const dateString = now.toLocaleDateString('en-GB');
+        const dateString = now.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,   // <-- this forces AM/PM
+          });
         const timestampISO = now.toISOString();
     
         setChatMessages((prev) => {
@@ -518,87 +413,6 @@ const LiveChat = () => {
         setConversationMessages([]);
         setCurrentChatIndex(0);
     };
-
-    // const updateSelectedChats = (updateField, newValue, newLabel ) => {
-    //     const now = new Date();
-    //     const today = now.toLocaleDateString("en-GB");
-    //     const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
-    //     const systemMsg = `Conversation updated to ${newLabel} by Jeeva at ${time}`;
-
-    //     setChatMessages((prev) =>
-    //         prev.map((group) => {
-             
-    //         // First update the chats
-    //         let updatedChats = group.chats.map((chat) => {
-    //             if (selectedChats.includes(chat.conversationId)) {
-    //                 const d = new Date();
-    //                 const updatedEndDate = d.toLocaleDateString("en-GB", {
-    //                     day: "2-digit",
-    //                     month: "2-digit",
-    //                     year: "numeric",
-    //                 });
-
-    //                 const lastMsg = chat.messages[chat.messages.length - 1];
-    //                 const lastDate =  lastMsg ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB") : null;
-
-    //                 const newMessages = [...chat.messages];
-
-    //                 if (lastDate !== today) {
-    //                     newMessages.push({
-    //                         sender : "System",
-    //                         role: "date",
-    //                         message: today,
-    //                         timestamp: new Date().toISOString(),
-    //                     })
-    //                 }
-
-    //                 newMessages.push({
-    //                     sender: "System",
-    //                     role: "system",
-    //                     message: systemMsg,
-    //                     timestamp: now.toISOString(),
-    //                 });
-
-    //                 if (updateField === "status") {
-    //                     return {
-    //                         ...chat,
-    //                         [updateField]: newValue,
-    //                         endDate: updatedEndDate,
-    //                         messages: newMessages,
-    //                     };
-    //                 } else {
-    //                     return {
-    //                         ...chat,
-    //                         [updateField]: {type: newValue, name: newLabel},
-    //                         endDate: updatedEndDate,
-    //                         messages: newMessages,
-    //                     };
-    //                 }
-    //             }
-    //             return chat;
-    //         });
-
-    //         // Now reorder updated chats to bring updated ones to the front
-    //         const reorderedChats = [
-    //             ...updatedChats.filter((chat) => selectedChats.includes(chat.conversationId)),
-    //             ...updatedChats.filter((chat) => !selectedChats.includes(chat.conversationId)),
-    //         ];
-            
-    //         return { ...group, chats: reorderedChats };
-    //         })
-            
-    //     );
-
-    //     setSelectedChat(null);
-    //     setConversationMessages([]);
-    //     setCurrentChatIndex(0);
-
-    //     setSelectedChats([]);
-    //     setOpenBulkUpdate(false);
-    //     setOpenMerge(false);
-    //     setAssignedName(newLabel);
-    // };
-    // console.log(chatMessages, "Chart messages");
        
     const updateSelectedChats = (updateField, newValue, newLabel) => {
         const now = new Date();
@@ -613,11 +427,14 @@ const LiveChat = () => {
             const updatedGroups = prevGroups.map((group) => {
                 const updatedChats = group.chats.map((chat) => {
                     if (selectedChats.includes(chat.conversationId)) {
-                        const updatedEndDate = now.toLocaleDateString("en-GB", {
+                        const updatedEndDate = now.toLocaleString("en-GB", {
                             day: "2-digit",
                             month: "2-digit",
                             year: "numeric",
-                        });
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,   // <-- this forces AM/PM
+                        })
 
                         const lastMsg = chat.messages?.length
                             ? chat.messages[chat.messages.length - 1]
@@ -668,10 +485,6 @@ const LiveChat = () => {
 
                         if (type === "agent") {
                              targetGroupName = "All Bot Conversations";
-                            // else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
-                            // else if (status === "on_hold") targetGroupName = "My On Hold Chats";
-                            // else if (status === "closed") targetGroupName = "My Resolved Chats";
-                            // else targetGroupName = "My Open Chats";
                         } else {
                             if (status === "waiting_us") targetGroupName = "My Waiting on Us Chats";
                             else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
@@ -724,166 +537,150 @@ const LiveChat = () => {
             minute: "2-digit",
             hour12: true,
         });
+
         const systemMsg = `Assigned to ${name} by Jeeva at ${time}`;
 
         const targetIds =
             selectedChats && selectedChats.length > 0
-            ? selectedChats
-            : selectedChat
-            ? [selectedChat.conversationId]
-            : [];
+                ? selectedChats
+                : selectedChat
+                    ? [selectedChat.conversationId]
+                    : [];
 
+        // No chat selected → only update UI
         if (targetIds.length === 0) {
             setAssignedName(name);
             setPrevAssignedName(name);
             return;
         }
 
-        setChatMessages((prevGroups) => {
-            let movedChats = []; // store chats that should move
+        // Find the selected chat to check previous type
+        const allChats = chatMessages.flatMap(g => g.chats);
+        const selectedMsg = allChats.find(
+            chat => chat.conversationId === targetIds[0]
+        );
 
-            // Step 1: Update chats and collect moved ones
-            const updatedGroups = prevGroups.map((group) => {
-            const updatedChats = group.chats.map((chat) => {
-                if (targetIds.includes(chat.conversationId)) {
-                const updatedEndDate = now.toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                });
+        const prevType = selectedMsg?.managed_by?.type;
+        console.log("New:", type, "Prev:", prevType);
 
-                const lastMsg =
-                    chat.messages && chat.messages.length
-                    ? chat.messages[chat.messages.length - 1]
-                    : null;
-                const lastDate = lastMsg
-                    ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB")
-                    : null;
+        // If same type → update UI only (fixes disappearing header)
+        if (type === prevType) {
+            setAssignedName(name);
+            setPrevAssignedName(name);
+            setSelectedChats([]);
+            setOpenAssignUser(false);
+            return;
+        }
 
-                const newMessages = [...(chat.messages || [])];
-                if (lastDate !== today) {
-                    newMessages.push({
-                    sender: "System",
-                    role: "date",
-                    message: today,
-                    timestamp: now.toISOString(),
+        // Else proceed to move chats
+        setChatMessages(prevGroups => {
+            let movedChats = [];
+
+            const updatedGroups = prevGroups.map(group => {
+                const updatedChats = group.chats.map(chat => {
+                    if (!targetIds.includes(chat.conversationId)) return chat;
+
+                    const updatedEndDate = now.toLocaleString("en-GB", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true,   // <-- this forces AM/PM
                     });
-                }
 
-                newMessages.push({
-                    sender: "System",
-                    role: "system",
-                    message: systemMsg,
-                    timestamp: now.toISOString(),
+                    const lastMsg = chat.messages[chat.messages.length - 1];
+                    const lastDate = lastMsg
+                        ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB")
+                        : null;
+
+                    const newMessages = [...chat.messages];
+
+                    if (lastDate !== today) {
+                        newMessages.push({
+                            sender: "System",
+                            role: "date",
+                            message: today,
+                            timestamp: now.toISOString(),
+                        });
+                    }
+
+                    newMessages.push({
+                        sender: "System",
+                        role: "system",
+                        message: systemMsg,
+                        timestamp: now.toISOString(),
+                    });
+
+                    const status = chat.status || "";
+                    let targetGroupName = "";
+
+                    // Assigning logic
+                    if (type === "admin") {
+                        if (status === "waiting_us") targetGroupName = "My Waiting on Us Chats";
+                        else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
+                        else if (status === "on_hold") targetGroupName = "My On Hold Chats";
+                        else if (status === "closed") targetGroupName = "My Resolved Chats";
+                        else targetGroupName = "My Open Chats";
+                    } else if (type === "team") {
+                        if (status === "new") targetGroupName = "All Open Chats";
+                        else targetGroupName = "All Unassigned Chats";
+                    } else {
+                        if (status === "waiting_us") targetGroupName = "All Waiting on Us Chats";
+                        else if (status === "waiting_customer") targetGroupName = "All Waiting on Customer Chats";
+                        else if (status === "on_hold") targetGroupName = "All On Hold Chats";
+                        else if (status === "closed") targetGroupName = "All Resolved Chats";
+                        else targetGroupName = "All Bot Conversations";
+                    }
+
+                    movedChats.push({
+                        ...chat,
+                        endDate: updatedEndDate,
+                        messages: newMessages,
+                        managed_by: { type, name },
+                        targetGroupName,
+                    });
+
+                    return null;
                 });
 
- 
-                const status = chat?.status || "";
-                let targetGroupName = "";
-
-                if (type === "admin") {
-                    if (status === "waiting_us") targetGroupName = "My Waiting on Us Chats";
-                    else if (status === "waiting_customer") targetGroupName = "My Waiting on Customer Chats";
-                    else if (status === "on_hold") targetGroupName = "My On Hold Chats";
-                    else if (status === "closed") targetGroupName = "My Resolved Chats";
-                    else targetGroupName = "My Open Chats";
-                } else if (type === "team") {
-                    if (status === "new") targetGroupName = "All Open Chats";
-                    else targetGroupName = "All Unassigned Chats";
-                } else {
-                    if (status === "waiting_us") targetGroupName = "All Waiting on Us Chats";
-                    else if (status === "waiting_customer") targetGroupName = "All Waiting on Customer Chats";
-                    else if (status === "on_hold") targetGroupName = "All On Hold Chats";
-                    else if (status === "closed") targetGroupName = "All Resolved Chats";
-                    // else if (status === "open_chats") targetGroupName = "All Open Chats";
-                }
-
-                const updatedChat = {
-                    ...chat,
-                    endDate: updatedEndDate,
-                    messages: newMessages,
-                    managed_by: { type: type, value: name },
-                    targetGroupName,
-                };
-                console.log(updatedChat, "updated chat");
-
-                // Store it for moving to target group
-                movedChats.push(updatedChat);
-
-                // Remove from current group
-                return null;
-                }
-                return chat;
+                return { ...group, chats: updatedChats.filter(Boolean) };
             });
 
-            return { ...group, chats: updatedChats.filter(Boolean) };
-            });
+            const finalGroups = updatedGroups.map(group => {
+                const chatsToMove = movedChats.filter(
+                    chat => chat.targetGroupName === group.name
+                );
 
-            // Step 2: Move each updated chat into its target group
-            let finalGroups = updatedGroups.map((group) => {
-            // Find chats whose target group matches this group name
-            const chatsToMove = movedChats.filter(
-                (chat) => chat.targetGroupName === group.name
-            );
+                if (chatsToMove.length > 0) {
+                    return {
+                        ...group,
+                        chats: [...chatsToMove, ...group.chats],
+                    };
+                }
 
-            if (chatsToMove.length > 0) {
-                return {
-                ...group,
-                chats: [...chatsToMove, ...group.chats], // prepend moved chats
-                };
-            }
-
-            return group;
+                return group;
             });
 
             return finalGroups;
         });
 
-        // Update selected chat in state
-        setSelectedChat((prev) => {
-            if (prev && targetIds.includes(prev.conversationId)) {
-            const updated = {
+        // Update selectedChat
+        setSelectedChat(prev => {
+            if (!prev || !targetIds.includes(prev.conversationId)) return prev;
+
+            return {
                 ...prev,
-                managed_by: { ...(prev.managed_by || {}), name },
+                managed_by: { type, name },
             };
-
-            setConversationMessages((curMsgs) => {
-                const lastMsg =
-                curMsgs && curMsgs.length ? curMsgs[curMsgs.length - 1] : null;
-                const lastDate = lastMsg
-                ? new Date(lastMsg.timestamp).toLocaleDateString("en-GB")
-                : null;
-
-                let newMessages = [...(curMsgs || [])];
-                if (lastDate !== today)
-                newMessages.push({
-                    sender: "System",
-                    role: "date",
-                    message: today,
-                    timestamp: now.toISOString(),
-                });
-                newMessages.push({
-                sender: "System",
-                role: "system",
-                message: systemMsg,
-                timestamp: now.toISOString(),
-                });
-                return newMessages;
-            });
-
-            return updated;
-            }
-            return prev;
         });
 
+        // Always update UI
         setAssignedName(name);
         setPrevAssignedName(name);
         setSelectedChats([]);
+        setOpenAssignUser(false);
     };
-
-
-
-
 
     return (
         <div className='pt-16.5 text-black h-screen w-full flex'>
@@ -1003,7 +800,7 @@ const LiveChat = () => {
                                         
                                     }}
                                     className={`outline-0 text-sm font-bold placeholder-gray-500 transition-colors duration-200 ${openAddContacts && "max-xl:hidden"} ${openAssignUser ? "text-gray-400" : "text-black"}`}
-                                    onClick={() => {
+                                    onClick={(e) => {
                                         setPrevAssignedName(assignedName)
                                         setAssignedName("");
                                         setOpenAssignUser(true);
@@ -1024,9 +821,10 @@ const LiveChat = () => {
                                         <div key={i} className="px-1">
                                             <p className="text-xs text-gray-400 px-5 py-2">{opt.category}</p>
                                             <h2 
-                                            className="text-gray-600 h-8 flex items-center px-3 text-sm hover:bg-green-200 rounded cursor-pointer"
+                                            className={`text-gray-600 h-8 flex items-center px-3 text-sm hover:bg-green-200 rounded cursor-pointer ${prevAssignedName === opt.value ? "bg-green-300" : ""}`}
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                setPrevType(opt.type);
                                                 // setAssignedName(opt.value);
                                                 // setPrevAssignedName(opt.value);
                                                 handleUpdateUser(opt.value, opt.type);
@@ -1104,11 +902,12 @@ const LiveChat = () => {
                                 <div className=" px-3 h-full">
                                     
                                     {(selectedConversation && conversationMessages.length > 0) ? (conversationMessages).map((msg, index) => {
-                                        if (msg.sender === "System" && msg.role === "date") {
+                                        if (msg.sender === "System" && msg.role === "date") {  
+                                            const msgDate = parse(msg.message, "dd/MM/yyyy", new Date());
                                             return (
                                                 <div key={index} className="flex justify-center my-3 sticky top-0 z-[1]">
                                                     <span className="bg-white text-gray-500 text-xs px-4 py-2 rounded shadow-5">
-                                                        {msg.message}
+                                                        { isToday(msgDate) ? "Today" : isYesterday(msgDate) ? "Yesterday" : msg.message }
                                                     </span>
                                                 </div>
                                             );
@@ -1143,10 +942,14 @@ const LiveChat = () => {
                                                     </div>
 
                                                     {/* Message bubble */}
-                                                    <div className="max-w-[70%] flex flex-col gap-2 bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative min-h-10">
-                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }} className="mr-5"></p>
+                                                    <div className="max-w-[70%] flex flex-row gap-2 bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative min-h-10">
+                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }} className="mr-5 pb-3"></p>
                                                         <div className="flex justify-end gap-3">
-                                                            <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
+                                                            <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{new Date(msg.timestamp).toLocaleTimeString([], {
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                                hour12: true
+                                                            })}</div>
                                                             <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative"></i>
                                                         </div>
                                                     </div>
@@ -1189,13 +992,13 @@ const LiveChat = () => {
                                                     {/* Message bubble */}
                                                     <div className="flex flex-col max-w-[90%] items-end">
                                                         <div className="font-bold text-[14px] text-gray-700">{msg.sender}</div>
-                                                        <div className="max-w-full w-fit flex flex-col gap-2 justify-end bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative  min-h-10">
-                                                            <p dangerouslySetInnerHTML={{ __html: msg.message }} className="mr-5"></p>
+                                                        <div className="max-w-full w-fit flex flex-row gap-2 justify-end bg-green-200 text-gray-800 px-3 py-1 ml-5 rounded-lg shadow-sm text-xs relative  min-h-10">
+                                                            <p dangerouslySetInnerHTML={{ __html: msg.message }} className={`${msg.message.length === 0 ? "hidden" : "block"} mr-5`}></p>
 
                                                             
                                                             {/* Attachment rendering */}
                                                             {msg.attachments && msg.attachments.length > 0 && (
-                                                                <div className="mt-2 flex flex-col gap-2">
+                                                                <div className="my-2 flex flex-col gap-2">
                                                                     {msg.attachments.map((file, i) => {
                                                                     const fileType = file.type || "";
 
@@ -1257,7 +1060,7 @@ const LiveChat = () => {
                                                                     return (
                                                                         <div
                                                                         key={i}
-                                                                        className="bg-gray-300 rounded-lg p-3 shadow-md max-w-[90%] flex items-center gap-3"
+                                                                        className="bg-gray-300 rounded-lg py-3 pl-3 pr-5 shadow-md max-w-[97%] flex items-center gap-3"
                                                                         >
                                                                         {/* <div className="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
                                                                             <i className="fa-solid fa-file-pdf text-red-600 text-lg"></i>
@@ -1306,7 +1109,11 @@ const LiveChat = () => {
 
 
                                                             <div className="flex justify-end gap-3">
-                                                                <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
+                                                                <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{new Date(msg.timestamp).toLocaleTimeString([], {
+                                                                    hour: "2-digit",
+                                                                    minute: "2-digit",
+                                                                    hour12: true
+                                                                })}</div>
                                                                 <i className="fa-solid fa-check-double text-green-600 text-[10px] mt-auto relative"></i>
                                                             </div>
                                                         </div>
@@ -1325,9 +1132,13 @@ const LiveChat = () => {
                                             return (
                                                 <div key={index} className="flex justify-start mb-3 group">
                                                     <div className="relative left-3 group w-0 h-0 border-l-[30px] border-l-transparent border-r-[0px] border-r-transparent border-t-[15px] border-t-white"></div>
-                                                    <div className="max-w-[70%] min-h-10 flex flex-col gap-2 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-sm text-xs">
-                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }}></p>
-                                                        <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{msg.time || msg.timestamp}</div>
+                                                    <div className="max-w-[70%] min-h-10 flex flex-row gap-2 bg-white text-gray-800 px-3 py-1 rounded-lg shadow-sm text-xs">
+                                                        <p dangerouslySetInnerHTML={{ __html: msg.message }} className="mr-5 pb-3"></p>
+                                                        <div className="text-[10px] min-w-fit text-gray-500 text-right mt-auto">{new Date(msg.timestamp).toLocaleTimeString([], {
+                                                        hour: "2-digit",
+                                                        minute: "2-digit",
+                                                        hour12: true
+                                                    })}</div>
                                                     </div>
                                                     <div className="flex items-center group/arrow cursor-pointer ">
                                                         <div className="relative mb-1.5">
@@ -1505,7 +1316,10 @@ const LiveChat = () => {
                                 <ChatReplyBox 
                                 files={files} 
                                 setFiles={setFiles} 
+                                selectedChat={selectedChat}
                                 setOpenCannedRes={setOpenCannedRes}
+                                setChatMessages={setChatMessages}
+                                setCurrentChatIndex={setCurrentChatIndex}
                                 setOpenMediaLibrary={setOpenMediaLibrary}
                                 setConversationMessages={setConversationMessages}
                                 />

@@ -5,7 +5,7 @@ import EmojiPicker from "emoji-picker-react";
 import { aiChatData } from "../../data/chat";
 import { useRef, useEffect, useState } from "react";
 
-export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpenMediaLibrary, setConversationMessages }) {
+export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpenMediaLibrary, setConversationMessages, setChatMessages, selectedChat, setCurrentChatIndex }) {
   const textareaRef = useRef(null);
   const addFileRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -132,6 +132,63 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
 
     }
 
+    setChatMessages((prevGroups) => {
+      return prevGroups.map((group) => {
+        const updatedChats = [...group.chats];
+
+        const index = updatedChats.findIndex(
+          (c) => c.conversationId === selectedChat.conversationId
+        );
+
+        if (index === -1) return group;
+
+        const chat = updatedChats[index];
+
+        // 🔥 Build full updated messages same as conversationMessages
+        const mergedMessages = [...chat.messages];
+
+        const lastMsg = chat.messages[chat.messages.length - 1];
+        const lastDate = lastMsg ? lastMsg.timestamp.split("T")[0] : null;
+
+        const nowIso = now.toISOString().split("T")[0];
+
+        // 🔥 Add date message here too
+        if (!lastMsg || lastDate !== nowIso) {
+          mergedMessages.push({
+            sender: "System",
+            role: "date",
+            message: now.toLocaleDateString("en-GB"),
+            timestamp: now.toISOString(),
+          });
+        }
+
+        // 🔥 Add new messages
+        mergedMessages.push(...newMessages);
+
+        const updatedChat = {
+          ...chat,
+          endDate: now.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,   // <-- this forces AM/PM
+          }),
+          messages: mergedMessages,
+          isRead: true,
+        };
+
+        updatedChats.splice(index, 1);
+
+        return {
+          ...group,
+          chats: [updatedChat, ...updatedChats],
+        };
+      });
+    });
+
+
     setConversationMessages((prev) => {
       const updatedMessages = [...prev];
       const lastMsg = prev[prev.length - 1];
@@ -148,7 +205,8 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
 
       updatedMessages.push(...newMessages);
       return updatedMessages;
-    });
+    });       
+
 
     // clear input and attached files after sending
     setMessage("");
@@ -159,6 +217,7 @@ export default function ChatReplyBox({ files, setFiles, setOpenCannedRes, setOpe
       } catch (e) {}
     }, 3000);
     setFiles([]);
+    setCurrentChatIndex(0);
   };
 
   const handleMouseEnter = () => {
