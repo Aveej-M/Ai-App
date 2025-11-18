@@ -86,7 +86,7 @@ export const chatData = {
 };
 
 export const chatManage = [
-    { label: "AI Chatbot", value:"agent-chat" },
+    { label: "AI Chatbot", value:"agent" },
     { label: "All", value:"all" },
     { label: "Chatbot", value:"bot" },
     { label: "Team", value:"team" },
@@ -341,7 +341,7 @@ export const chatMessages = [
       {
         conversationId: "bot-chat-002",
         user: "Guest user 2",
-        channel: "Web",
+        // channel: "Web",
         startDate: "16/10/2025",
         endDate: "13/11/2025",
         messages: [
@@ -384,7 +384,7 @@ export const chatMessages = [
       {
         conversationId: "bot-chat-003",
         user: "Guest user 3",
-        channel: "Web",
+        // channel: "Web",
         startDate: "19/08/2025",
         endDate: "27/08/2025",
         messages: [
@@ -689,7 +689,7 @@ export const chatMessages = [
       {
         conversationId: "bot-chat-008",
         user: "Guest user 8",
-        channel: "Web",
+        // channel: "Web",
         startDate: "16/10/2025",
         endDate: "27/08/2025",
         messages: [
@@ -725,7 +725,7 @@ export const chatMessages = [
           }
         ],
         managed_by: "agent-chat",
-        source: "web",
+        source: "whatsapp",
         status: "new",
         isRead: true,
       },

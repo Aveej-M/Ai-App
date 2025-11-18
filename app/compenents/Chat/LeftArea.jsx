@@ -17,7 +17,7 @@ const LeftArea = ({ bookMark, selectedConversation, searchRef, openSearchTab, op
                   item.user.toLowerCase().includes(searchInput.toLowerCase()) &&
                   (statusConversation === "" || item.status === statusConversation) &&
                   (sourceChat === "all" || item.source === sourceChat) &&
-                  (manageChat === "all" || item.managed_by === manageChat)
+                  (manageChat === "all" || item.managed_by?.type === manageChat)
               )
         : [];
 

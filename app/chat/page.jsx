@@ -68,7 +68,7 @@ const LiveChat = () => {
     const [filterApplied, setFilterApplied] = useState({
       status: false,
       source: false,
-      manager: false,
+      managed_by: false,
     });
     
 
@@ -879,7 +879,7 @@ const LiveChat = () => {
                             <i onClick={
                              () => chatEndRef.current?.scrollIntoView({ behavior: "smooth" })
                             }
-                            className={`fa-solid fa-angle-down text-black bg-white rounded-full fixed ${selectedChat?.status !== "closed" ? "bottom-40" : "bottom-30"} right-8 z-20 px-3 py-2.5 shadow-5 cursor-pointer ${animate} transition-all duration-400`}></i>
+                            className={`fa-solid fa-angle-down text-black bg-white rounded-full fixed ${selectedChat?.status !== "closed" ? "bottom-40" : "bottom-30"} right-8 z-20 px-3 py-[11px] shadow-5 cursor-pointer ${animate} transition-all duration-400`}></i>
                             )}
 
                             <div className=" flex flex-col w-full h-full">

@@ -112,15 +112,16 @@ const FilterTab = ({ setOpenFilterTab, statusConversation, setStatusConversation
                   options={chatManage}
                   value={chatManage.find(option => option.value === tempManageChat)}
                   onChange={(e)=> {setTempManageChat(e.value);
-                    if (e.value !== "" && !filterApplied.manager) {
+                    if (e.value !== "" && !filterApplied.managed_by) {
+                     
                     setFilterCount(filterCount + 1);
-                    setFilterApplied(prev => ({ ...prev, manager: true }))
+                    setFilterApplied(prev => ({ ...prev, managed_by: true }))
                   }}}
                   styles={customStyles}
                   className="w-full text-sm"
                   components={{
                   IndicatorSeparator: () => null
-                  }}
+                  }}  
               />
             </div>
 
